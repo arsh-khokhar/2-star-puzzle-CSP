@@ -88,6 +88,3 @@ def display_grid(blocks, grid_length, star_locs=None, show_block_ids=False, show
     ax.axis('off')
     
     plt.show()
-
-def set_visible(label):
-    index = labels.index(label)
