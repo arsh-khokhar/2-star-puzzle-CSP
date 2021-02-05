@@ -1,5 +1,4 @@
 from GridDisplay import display_grid
-from Csp import Csp2Star
 
 def load_grid_file(name):
     """
