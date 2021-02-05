@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
+import matplotlib.widgets as widgets
 from math import floor
 import numpy as np
 
-
-def display_grid(blocks, star_locs=None, show_block_ids=False, show_ids=False):
+def display_grid(blocks, grid_length, star_locs=None, show_block_ids=False, show_ids=False):
     """
     Displays a grid, with thick lines separating blocks. Optionally, can show
     stars, block ids, and/or position ids.
@@ -14,15 +14,21 @@ def display_grid(blocks, star_locs=None, show_block_ids=False, show_ids=False):
     :param show_ids: Show position ids within each position.
     :return: Opens a new window to display the grid.
     """
-    grid_length = len(blocks)
 
     # Create figure and axes
     fig, ax = plt.subplots()
 
+    # create grid
     for x in range(grid_length + 1):
         ax.axhline(x, lw=2, color='c')
         ax.axvline(x, lw=2, color='c')
 
+    # create bolder borders around grid
+    for x in (0, grid_length):
+        ax.axhline(x, lw=8, color='k')
+        ax.axvline(x, lw=8, color='k')
+    
+    ax.axvline(x, lw=2, color='k')
     for blockNum, block in enumerate(blocks):
         for cell in block:
             if show_block_ids:
@@ -80,5 +86,8 @@ def display_grid(blocks, star_locs=None, show_block_ids=False, show_ids=False):
     ax.yaxis.tick_left()  # remove right y-Ticks
 
     ax.axis('off')
-
+    
     plt.show()
+
+def set_visible(label):
+    index = labels.index(label)
