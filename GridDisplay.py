@@ -66,12 +66,10 @@ def display_grid(blocks, grid_length, star_locs=None, show_block_ids=False, show
                            ymin=y_min, ymax=y_max, color='k')
             # above line
             if cell - grid_length not in block:
-                print("Line above {0} in block {1}".format(cell,blockNum))
                 ax.axhline(floor((cell - 1) / grid_length), lw=4,
                            xmin=x_min, xmax=x_max, color='k')
             # below line
             if cell + grid_length not in block:
-                print("Line above {0} in block {1}".format(cell, blockNum))
                 ax.axhline(floor((cell - 1) / grid_length) + 1, lw=4,
                            xmin=x_min, xmax=x_max, color='k')
 

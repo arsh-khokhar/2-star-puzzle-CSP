@@ -7,4 +7,5 @@
 Python : 3.8
 Numpy : 1.20.0
 Mathplotlib: 3.3.4
+pytest: 6.2.2
 ```
