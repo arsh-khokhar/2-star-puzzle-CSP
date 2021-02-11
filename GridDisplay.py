@@ -3,12 +3,15 @@ import matplotlib.widgets as widgets
 from math import floor
 import numpy as np
 
-def display_grid(blocks, grid_length, star_locs=None, show_block_ids=False, show_ids=False):
+
+def display_grid(blocks: list, grid_length: int, star_locs: list = None,
+                 show_block_ids: bool = False, show_ids: bool = False):
     """
     Displays a grid, with thick lines separating blocks. Optionally, can show
     stars, block ids, and/or position ids.
 
-    :param blocks: A 2-D array containing the blocks, and their contents.
+    :param blocks: 2-D array containing the blocks, and their contents.
+    :param grid_length: Size of the grid (10x10 grid -> 10)
     :param star_locs: Locations of stars.
     :param show_block_ids: Show block id within each grid position.
     :param show_ids: Show position ids within each position.

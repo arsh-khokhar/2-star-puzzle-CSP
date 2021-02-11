@@ -1,0 +1,402 @@
+[
+  {
+    "creation_date": "2018-05-11 09:30:26",
+    "puzzle_data": {
+      "puzz": "AAAAAAABBBAAAACCBBBBDDDACCCCBBDDDECEFCCBDDEEEEFCGGDEEEEEFGGGEEHHEEGGGIEEEHEEEGGIEJJHEEEJGIEJJJJJJJJJ",
+      "branches": 0,
+      "width": 10,
+      "work": 0,
+      "height": 10,
+      "solved": "0001000100100001000000100000100000101000010000001000001010000010000001100000010000010000010100010000",
+      "ptitle": "KD_Star_10x10_V2-B40-P1",
+      "stars": 2,
+      "lwork": 0
+    },
+    "puzzle_id": "KD_Star_10x10_V2-B40-P1",
+    "success": true
+  },
+  {
+    "puzzle_data": {
+      "puzz": "AAAAAAABBBAAAACCBBBBDDDACCCCBBDDDECEFCCBDDEEEEFCGGDEEEEEFGGGEEHHEEGGGIEEEHEEEGGIEJJHEEEJGIEJJJJJJJJJ",
+      "branches": 0,
+      "width": 10,
+      "work": 0,
+      "height": 10,
+      "solved": "0001000100100001000000100000100000101000010000001000001010000010000001100000010000010000010100010000",
+      "ptitle": "KD_Star_10x10_V2-B40-P1",
+      "stars": 2,
+      "lwork": 0
+    },
+    "puzzle_id": "KD_Star_10x10_V2-B40-P1",
+    "success": true,
+    "creation_date": "2018-05-11 09:30:26"
+  },
+  {
+    "puzzle_data": {
+      "puzz": "ABBBCDDDEEABBBCDDEEEAABBCCDDDEBBBBCCDDDEFFFBBBGGDDFHBBGGGIDDHHHBGGGIDDHHHHHGIIJJHHHHHGJJJJHHHHHHJJJJ",
+      "branches": 0,
+      "width": 10,
+      "work": 0,
+      "height": 10,
+      "solved": "1010000000000010001001000010000000100001101000000000000101000001000001000001010001010000000000001010",
+      "ptitle": "KD_Star_10x10_V2-B40-P2",
+      "stars": 2,
+      "lwork": 0
+    },
+    "puzzle_id": "KD_Star_10x10_V2-B40-P2",
+    "success": true,
+    "creation_date": "2018-05-11 09:30:26"
+  },
+  {
+    "puzzle_data": {
+      "puzz": "AAAABBBBBBAAAABBBBBBAAAACCDDDBAEEEECDDDFGHEECCDDCFGHHHHCCCCFGGHIICCFFFHHHIIIJJJFHJJJJJJJJFJJJJJJJFFF",
+      "branches": 0,
+      "solved": "0000010100010100000000000010100010100000100000001000001010000100000001000101000010000001000010000001",
+      "work": 0,
+      "height": 10,
+      "width": 10,
+      "ptitle": "KD_Star_10x10_V2-B40-P3",
+      "stars": 2,
+      "lwork": 0
+    },
+    "puzzle_id": "KD_Star_10x10_V2-B40-P3",
+    "success": true,
+    "creation_date": "2018-05-11 09:30:26"
+  },
+  {
+    "puzzle_data": {
+      "puzz": "AAABBCCCCCABBBBBCCCDABEFFFFCCDAAEFFGGCCDAAEFFGHHDDAAAFGGHDDDAFFFGHHDIIJJFFJHHHHIJJJFJHHHHIJJJJJHHHHH",
+      "branches": 0,
+      "width": 10,
+      "work": 0,
+      "height": 10,
+      "solved": "0001000100100001000000100000100000101000001000001010001000000000000101010001000000010000010100001000",
+      "ptitle": "KD_Star_10x10_V2-B40-P4",
+      "stars": 2,
+      "lwork": 0
+    },
+    "puzzle_id": "KD_Star_10x10_V2-B40-P4",
+    "success": true,
+    "creation_date": "2018-05-11 09:30:27"
+  },
+  {
+    "puzzle_data": {
+      "puzz": "AABBCCCCCCAABBCCCCCCAABDDDDCCCADDDDCCCCCEEEEECCCFFEEEGGGGCFFHHEGGIGCFFHHEEJIIIFFHHHEJJJJJFHHHEJJJJJF",
+      "branches": 0,
+      "solved": "0001000100100000000100100010001000100000001000001000001010000100000001000001010001010000000000010010",
+      "work": 0,
+      "height": 10,
+      "width": 10,
+      "ptitle": "KD_Star_10x10_V2-B40-P5",
+      "stars": 2,
+      "lwork": 0
+    },
+    "puzzle_id": "KD_Star_10x10_V2-B40-P5",
+    "success": true,
+    "creation_date": "2018-05-11 09:30:27"
+  },
+  {
+    "puzzle_data": {
+      "puzz": "AABBBBCCCCAAABBBCDDDAAEBBFCDDDEEEBFFFDDDGGGGFFFFFDGGGGGGGGGDGGHHGIIGGDGJJHGIIIDDGJJHGGDDDDGJJJJJJJJJ",
+      "branches": 0,
+      "width": 10,
+      "work": 0,
+      "height": 10,
+      "solved": "0000010010101000000000001010001010000000000010001001000010000001000001000001010000010000010100000100",
+      "ptitle": "KD_Star_10x10_V2-B40-P6",
+      "stars": 2,
+      "lwork": 0
+    },
+    "puzzle_id": "KD_Star_10x10_V2-B40-P6",
+    "success": true,
+    "creation_date": "2018-05-11 09:30:28"
+  },
+  {
+    "puzzle_data": {
+      "puzz": "AABBBCCCDDABBBBBDDDEABFFFFDDEEAFFFFFDDEDAAAAFFDDDDGAAAFHDDDDGAAIFHHHDDGGIIFFHHHHGGGIIFJJJHGGGIJJJHHH",
+      "branches": 0,
+      "solved": "0000010100000100000101000010000000100010101000000000000100011000000100001010000000000010100101000000",
+      "work": 0,
+      "height": 10,
+      "width": 10,
+      "ptitle": "KD_Star_10x10_V2-B40-P7",
+      "stars": 2,
+      "lwork": 0
+    },
+    "puzzle_id": "KD_Star_10x10_V2-B40-P7",
+    "success": true,
+    "creation_date": "2018-05-11 09:30:28"
+  },
+  {
+    "puzzle_data": {
+      "puzz": "AAAAAABBBBACCAADDBBBACCCADDDBBAACAADEDDFGGAAAAEEDFGGGHAAEEDFHHGHHAEEDDHIIIHEEEEDHIIHHJJEJJHHHHHJJJJJ",
+      "branches": 0,
+      "width": 10,
+      "work": 0,
+      "height": 10,
+      "solved": "0000001010010100000000000101000010000001100010000000100000011000000100000101000001000000100000101000",
+      "ptitle": "KD_Star_10x10_V2-B40-P8",
+      "stars": 2,
+      "lwork": 0
+    },
+    "puzzle_id": "KD_Star_10x10_V2-B40-P8",
+    "success": true,
+    "creation_date": "2018-05-11 09:30:29"
+  },
+  {
+    "puzzle_data": {
+      "puzz": "AABBBBCCCCAABDDECCCCAABDEEECCCAAADDEEECCAAADDFCCCGHAAFFFCCGGHIIHFFFJJGHIIHFFFJJJHHIHHFFFJJHHHHHFFJJJ",
+      "branches": 0,
+      "width": 10,
+      "work": 0,
+      "height": 10,
+      "solved": "0001010000010000001000010100000100000100000010000110000010000010000001000010010010100000000000001010",
+      "ptitle": "KD_Star_10x10_V2-B40-P9",
+      "stars": 2,
+      "lwork": 0
+    },
+    "puzzle_id": "KD_Star_10x10_V2-B40-P9",
+    "success": true,
+    "creation_date": "2018-05-11 09:30:29"
+  },
+  {
+    "puzzle_data": {
+      "puzz": "AABBCCCDDDABBBBBBBDDAABBBBBBDDEABBBBBFFDEEEEEEFFFFEEEGEHFIIIGEGGHHFIIIGGGHHHIIIIGGHHHJIIIIGGHHHJJJJJ",
+      "branches": 0,
+      "width": 10,
+      "work": 0,
+      "height": 10,
+      "solved": "0000101000100000001000010100000100000001000100010001000000010000101000001000001010000100000010000100",
+      "ptitle": "KD_Star_10x10_V2-B40-P10",
+      "stars": 2,
+      "lwork": 0
+    },
+    "puzzle_id": "KD_Star_10x10_V2-B40-P10",
+    "success": true,
+    "creation_date": "2018-05-11 09:30:29"
+  },
+  {
+    "puzzle_data": {
+      "puzz": "AAAAAAABBBAAAAABBBBBCCCABBDDBBEEFGGGGDDDEFFFGDDDHDEFFFFFFDHHEEEFFFFHHHEEEIIFFHHHEEEIIIIIHHEEJJJIIIII",
+      "branches": 0,
+      "solved": "0001010000000000010110100000000000001010010010000000000001010100010000000100001010000010000010100000",
+      "work": 0,
+      "height": 10,
+      "width": 10,
+      "ptitle": "KD_Star_10x10_V2-B40-P11",
+      "stars": 2,
+      "lwork": 0
+    },
+    "puzzle_id": "KD_Star_10x10_V2-B40-P11",
+    "success": true,
+    "creation_date": "2018-05-11 09:30:30"
+  },
+  {
+    "puzzle_data": {
+      "puzz": "AAAABBBBCCAABAABBBCCDBBBBBCCCCDBEEBCCFFCDDEECCFFFCDDDEECFFGCDHDEICFGGCHHHHIIIGGCHHHIIIJGCCHHHIIJJJCC",
+      "branches": 0,
+      "width": 10,
+      "work": 0,
+      "height": 10,
+      "solved": "0010000001000010100010000000010000100100101000000000000010100101000000000001001001010000000000010100",
+      "ptitle": "KD_Star_10x10_V2-B40-P12",
+      "stars": 2,
+      "lwork": 0
+    },
+    "puzzle_id": "KD_Star_10x10_V2-B40-P12",
+    "success": true,
+    "creation_date": "2018-05-11 09:30:30"
+  },
+  {
+    "puzzle_data": {
+      "puzz": "AAAABBBCCCAAAABCCCCCAAAADDDDCCEEEADDDCCCEEFAAADCGCEEFAAAHGGCFFFIAAHHGCFJFIIIHHHCJJJJJIHHHHJJJJJJHHHH",
+      "branches": 0,
+      "solved": "0000001001010010000000000001010010010000100000001000101000000000001010100100000000000101000101000000",
+      "work": 0,
+      "height": 10,
+      "width": 10,
+      "ptitle": "KD_Star_10x10_V2-B40-P13",
+      "stars": 2,
+      "lwork": 0
+    },
+    "puzzle_id": "KD_Star_10x10_V2-B40-P13",
+    "success": true,
+    "creation_date": "2018-05-11 09:30:30"
+  },
+  {
+    "puzzle_data": {
+      "puzz": "AAAAABBBCCAAAAAAADDCAAAAAADDCCEEFFAEDDCCEFFEEEDDDDEEEEEEEGDGHHIIEJEGGGHIIIIJGGGGHHHHIJJJGGHHHHJJJJJJ",
+      "branches": 0,
+      "width": 10,
+      "work": 0,
+      "height": 10,
+      "solved": "0000010100001000000110000010000001000001010000010000010100001000000010001010000000000010100100100000",
+      "ptitle": "KD_Star_10x10_V2-B40-P14",
+      "stars": 2,
+      "lwork": 0
+    },
+    "puzzle_id": "KD_Star_10x10_V2-B40-P14",
+    "success": true,
+    "creation_date": "2018-05-11 09:30:31"
+  },
+  {
+    "puzzle_data": {
+      "puzz": "AAAABBBCCCDDABBBBCEEFDDDBBCCEGFFDDDBCCEGFDDDDBHHHGFDDDDHHHGGIIDDIHHHHGIIIIIHHHHGIIIIHHHHHGIIJJJJJJJG",
+      "branches": 0,
+      "width": 10,
+      "work": 0,
+      "height": 10,
+      "solved": "1000000100001000000100001010000100000010000101000010000000100010001000000010000101000001000001010000",
+      "ptitle": "KD_Star_10x10_V2-B40-P15",
+      "stars": 2,
+      "lwork": 0
+    },
+    "puzzle_id": "KD_Star_10x10_V2-B40-P15",
+    "success": true,
+    "creation_date": "2018-05-11 09:30:31"
+  },
+  {
+    "puzzle_data": {
+      "puzz": "AAAAAABBCCAADABBBBCCAADDDDBBBCAADDEEBBCCAAFEEEEGGCAAFFFFEGGCAAAAAAEGGCHHHHHHHHCCHIHHIIHJCCIIIIIIIJJJ",
+      "branches": 0,
+      "width": 10,
+      "work": 0,
+      "height": 10,
+      "solved": "0000001010001010000010000000010001010000100000010000101000000000001010010100000000000101000100000001",
+      "ptitle": "KD_Star_10x10_V2-B40-P16",
+      "stars": 2,
+      "lwork": 0
+    },
+    "puzzle_id": "KD_Star_10x10_V2-B40-P16",
+    "success": true,
+    "creation_date": "2018-05-11 09:30:32"
+  },
+  {
+    "puzzle_data": {
+      "puzz": "AABBCCCDEEAAABCBDDEEAAABBBDEEEFABBBBDDDDFAAAABBDDDFFGAAADDDDHHGAAAIDDJHHGHIIIIJJHHGHHIIHJJHHHHHHHHJJ",
+      "branches": 0,
+      "width": 10,
+      "work": 0,
+      "height": 10,
+      "solved": "0000001010010010000000000010101001000000000001010010100000000000100001001000010000000100010101000000",
+      "ptitle": "KD_Star_10x10_V2-B40-P17",
+      "stars": 2,
+      "lwork": 0
+    },
+    "puzzle_id": "KD_Star_10x10_V2-B40-P17",
+    "success": true,
+    "creation_date": "2018-05-11 09:30:32"
+  },
+  {
+    "puzzle_data": {
+      "puzz": "AAAAAAAAABACCCCDBBBBEEECCDDBFFECCCCCDBBFGHCCCDDBBFGHHCCCDDDFGGHCCCIIDFGGGGCCIFFFGGGGCIIJJJGGGGCIIJJJ",
+      "branches": 0,
+      "width": 10,
+      "work": 0,
+      "height": 10,
+      "solved": "0101000000000001010010100000000000100010010000100000001000010010001000100000001000010100000000000101",
+      "ptitle": "KD_Star_10x10_V2-B40-P18",
+      "stars": 2,
+      "lwork": 0
+    },
+    "puzzle_id": "KD_Star_10x10_V2-B40-P18",
+    "success": true,
+    "creation_date": "2018-05-11 09:30:32"
+  },
+  {
+    "puzzle_data": {
+      "puzz": "AAAABBBBBBAAAABBBBBBCCABBBBBDDCCEBFFFDDDCCEFFGHDDDIIEFFGHHHDIIIIFGHHDDIIIIGGGHHGIIIIJJGGHGIIIIJJJGGG",
+      "branches": 0,
+      "width": 10,
+      "work": 0,
+      "height": 10,
+      "solved": "0100000010000101000010000000100010001000100010000000100001000000010001000100010001000000010000101000",
+      "ptitle": "KD_Star_10x10_V2-B40-P19",
+      "stars": 2,
+      "lwork": 0
+    },
+    "puzzle_id": "KD_Star_10x10_V2-B40-P19",
+    "success": true,
+    "creation_date": "2018-05-11 09:30:33"
+  },
+  {
+    "puzzle_data": {
+      "puzz": "AAAAAAAABBAACCCCBBBBAAACDDDDBBEAADDDDDDDEAEFGGDDDDEEEFFGGDDDHHHFFFDDDDHIIFFFFJJJIIIFFJJJJJIIIIFJJJJJ",
+      "branches": 0,
+      "width": 10,
+      "work": 0,
+      "height": 10,
+      "solved": "0000000101010001000000010000011000000100001010000000000010101010000000000010100001000000100001010000",
+      "ptitle": "KD_Star_10x10_V2-B40-P20",
+      "stars": 2,
+      "lwork": 0
+    },
+    "puzzle_id": "KD_Star_10x10_V2-B40-P20",
+    "success": true,
+    "creation_date": "2018-05-11 09:30:33"
+  },
+  {
+    "puzzle_data": {
+      "puzz": "AAAABBBCCCAAAAAACCCCAADAECCFFCDADDECCCFCDDDDEECCFCGGGEEEEFFFGGEEHHHIIIGEEHHHHIIIJJJHHHHHHHJJJJJJHHHH",
+      "branches": 0,
+      "solved": "0000101000010000000100010001001000010000000100001001000100000000000101101000000000000010100010100000",
+      "work": 0,
+      "height": 10,
+      "width": 10,
+      "ptitle": "KD_Star_10x10_V2-B40-P21",
+      "stars": 2,
+      "lwork": 0
+    },
+    "puzzle_id": "KD_Star_10x10_V2-B40-P21",
+    "success": true,
+    "creation_date": "2018-05-11 09:30:33"
+  },
+  {
+    "puzzle_data": {
+      "puzz": "AAABBBCCCCAAAABBCCCCAAAABDDCCEAAAADDDCCEAAAADFFEEEGGAFFFFHHHGGIIFFFHHHGIIIIIHHHHGIIIIIHHHHJJJIIIIHHH",
+      "branches": 0,
+      "width": 10,
+      "work": 0,
+      "height": 10,
+      "solved": "0001000001000001010000010000010100001000000010001001000010000000100010101000000000000101001010000000",
+      "ptitle": "KD_Star_10x10_V2-B40-P22",
+      "stars": 2,
+      "lwork": 0
+    },
+    "puzzle_id": "KD_Star_10x10_V2-B40-P22",
+    "success": true,
+    "creation_date": "2018-05-11 09:30:34"
+  },
+  {
+    "puzzle_data": {
+      "puzz": "ABBBBCCCCCAAAABBCCCCAAAABDDDCCEEEEEDDDCFEEEEEEEDCFEEEEEEEDFFGEEHHHHHHHGGGHHHHHHHIIGHHHJHHHIIIHHHJJJH",
+      "branches": 0,
+      "width": 10,
+      "work": 0,
+      "height": 10,
+      "solved": "0100100000000000101001010000000000010001000100010000000100011000000100001010000010000010000010000010",
+      "ptitle": "KD_Star_10x10_V2-B40-P23",
+      "stars": 2,
+      "lwork": 0
+    },
+    "puzzle_id": "KD_Star_10x10_V2-B40-P23",
+    "success": true,
+    "creation_date": "2018-05-11 09:30:34"
+  },
+  {
+    "puzzle_data": {
+      "puzz": "AAABBCCCCCABBBCCCDDCAEBBBCFFDDAEEEEEFFFDAAAEEEGGFDHHAEGGGFFDHHGGGGFFFFHHGGGFFIIIHJJIIIIIIIJJJIIIIIII",
+      "branches": 0,
+      "width": 10,
+      "work": 0,
+      "height": 10,
+      "solved": "0010100000000000010100010100001000000001000001010001010000000000001010010010000000000010101010000000",
+      "ptitle": "KD_Star_10x10_V2-B40-P24",
+      "stars": 2,
+      "lwork": 0
+    },
+    "puzzle_id": "KD_Star_10x10_V2-B40-P24",
+    "success": true,
+    "creation_date": "2018-05-11 09:30:34"
+  }
+]

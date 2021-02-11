@@ -1,33 +1,33 @@
-from Assignment import Assignment
+from Csp import Csp
 from main import load_grid_file
 
 
-def init_assignment():
+def init_csp():
     blocks, grid_length = load_grid_file('grid8x8.txt')
-    return Assignment(grid_length, blocks)
+    return Csp(grid_length, blocks)
 
 
 TEST_VALUES_TO_ASSIGN = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
 
 
 def test_assign_value():
-    assignment = init_assignment()
+    csp = init_csp()
     for val in TEST_VALUES_TO_ASSIGN:
-        assignment.assign_value(assignment.next_star_to_assign, val)
-        assert assignment.star_values[val - 1] == val
+        csp.assign_value(csp.next_star_to_assign, val)
+        assert csp.star_values[val - 1] == val
 
-    assert assignment.is_complete_assignment
+    assert csp.complete_csp
 
 
 def test_unassign_value():
-    assignment = init_assignment()
+    csp = init_csp()
     for val in TEST_VALUES_TO_ASSIGN:
-        assignment.assign_value(assignment.next_star_to_assign, val)
+        csp.assign_value(csp.next_star_to_assign, val)
 
     for i in range(len(TEST_VALUES_TO_ASSIGN) - 1, -1, -1):
-        assert assignment.star_values[i] != -1
-        assignment.unassign_value(i)
-        assert assignment.star_values[i] == -1
+        assert csp.star_values[i] != -1
+        csp.unassign_value(i)
+        assert csp.star_values[i] == -1
 
 
 TEST_POSSIBLE_VALUES = [(0, [1, 2, 3, 4, 5, 6, 7, 8]),
@@ -39,23 +39,23 @@ TEST_ASSIGN_THEN_POSSIBLE_VALUES = [(6, 1, [1, 2, 3, 4, 8])]
 
 
 def test_possible_values():
-    assignment = init_assignment()
+    csp = init_csp()
     for star_num, expected_list in TEST_POSSIBLE_VALUES:
-        if not bool(set(assignment.possible_values(star_num))
+        if not bool(set(csp.possible_values(star_num))
                             .intersection(expected_list)):
             raise Exception("The case {0},{1} evaluated to {2}"
                             .format(star_num, expected_list,
-                                    assignment.possible_values(star_num)))
+                                    csp.possible_values(star_num)))
 
     for value_to_assign, star_num, expected_list in \
             TEST_ASSIGN_THEN_POSSIBLE_VALUES:
-        assignment.star_values[0] = value_to_assign
-        if not bool(set(assignment.possible_values(star_num))
+        csp.star_values[0] = value_to_assign
+        if not bool(set(csp.possible_values(star_num))
                             .intersection(expected_list)):
             raise Exception("The case {0},{1} evaluated to {2}"
                             .format(star_num, expected_list,
-                                    assignment.possible_values(star_num)))
-        assignment.star_values[0] = -1
+                                    csp.possible_values(star_num)))
+        csp.star_values[0] = -1
 
 
 TEST_SAME_ROW = [(1, 2, True), (1, 3, True), (1, 4, True), (1, 5, True),
@@ -65,9 +65,9 @@ TEST_SAME_ROW = [(1, 2, True), (1, 3, True), (1, 4, True), (1, 5, True),
 
 
 def test_same_row():
-    assignment = init_assignment()
+    csp = init_csp()
     for star1, star2, result in TEST_SAME_ROW:
-        if assignment.same_row(star1, star2) != result:
+        if csp.same_row(star1, star2) != result:
             raise Exception("The case {0},{1},{2} didn't evaluate as expected"
                             .format(star1, star2, result))
 
@@ -81,9 +81,9 @@ TEST_SAME_COL = [(1, 9, True), (1, 17, True), (1, 25, True), (1, 33, True),
 
 
 def test_same_col():
-    assignment = init_assignment()
+    csp = init_csp()
     for star1, star2, result in TEST_SAME_COL:
-        if assignment.same_col(star1, star2) != result:
+        if csp.same_col(star1, star2) != result:
             raise Exception("The case {0},{1},{2} didn't evaluate as expected"
                             .format(star1, star2, result))
 
@@ -96,9 +96,9 @@ TEST_SAME_BLOCK = [(1, 2, True), (1, 3, True), (1, 4, True), (1, 5, True),
 
 
 def test_same_block():
-    assignment = init_assignment()
+    csp = init_csp()
     for star1, star2, result in TEST_SAME_BLOCK:
-        if assignment.same_block(star1, star2) != result:
+        if csp.same_block(star1, star2) != result:
             raise Exception("The case {0},{1},{2} didn't evaluate as expected"
                             .format(star1, star2, result))
 
@@ -113,9 +113,9 @@ TEST_ARE_ADJACENT = [(10, 1, True), (10, 2, True), (10, 3, True),
 
 
 def test_are_adjacent():
-    assignment = init_assignment()
+    csp = init_csp()
     for star1, star2, result in TEST_ARE_ADJACENT:
-        if assignment.are_adjacent(star1, star2) != result:
+        if csp.are_adjacent(star1, star2) != result:
             raise Exception("The case {0},{1},{2} didn't evaluate as expected"
                             .format(star1, star2, result))
 
@@ -125,10 +125,10 @@ TEST_IS_VALID = [(1, True), (2, False), (3, True), (5, False), (9, False),
 
 
 def test_is_valid():
-    assignment = init_assignment()
+    csp = init_csp()
     for grid_index, result in TEST_IS_VALID:
-        if assignment.is_valid(grid_index) != result:
+        if csp.is_valid(grid_index) != result:
             raise Exception("The case {0},{1} didn't evaluate as expected"
                             .format(grid_index, result))
         elif result:
-            assignment.assign_value(assignment.next_star_to_assign, grid_index)
+            csp.assign_value(csp.next_star_to_assign, grid_index)
