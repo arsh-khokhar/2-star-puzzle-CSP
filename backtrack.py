@@ -1,6 +1,7 @@
 from GridDisplay import display_grid
 from CSP import Csp
 from Examples.StringToGridArray import convert_string_to_grid_array
+import json
 import datetime
 
 total_states = 0
@@ -8,7 +9,7 @@ curr_print_threshold = 0
 PRINT_THRESHOLD_INCREMENT = 100000
 
 
-def backtracking_search(blocks: list, grid_size: int):
+def backtrack(blocks: list, grid_size: int):
     """
     Helper method for recursive_backtracking_search
 
@@ -20,13 +21,13 @@ def backtracking_search(blocks: list, grid_size: int):
     total_states = 0
     curr_print_threshold = PRINT_THRESHOLD_INCREMENT
     start = datetime.datetime.now()
-    result = recursive_backtracking_search(Csp(grid_size, blocks))
+    result = recursive_backtrack(Csp(grid_size, blocks))
     end = datetime.datetime.now()
     print('Evaluation took: {0}'.format(end - start))
     return result
 
 
-def recursive_backtracking_search(csp: Csp):
+def recursive_backtrack(csp: Csp):
     """
     Implements backtracking search to solve a given Constraint Satisfaction
     Problem
@@ -43,7 +44,7 @@ def recursive_backtracking_search(csp: Csp):
         total_states += 1
         if csp.is_valid(value):
             csp.assign_value(curr, value)
-            result = recursive_backtracking_search(csp)
+            result = recursive_backtrack(csp)
             if result:
                 return result
             csp.unassign_value(curr)
@@ -58,9 +59,10 @@ grid, grid_length = convert_string_to_grid_array('ABBBCDDDEEABBBCDDEEEAABBCCDDD'
                                                  'EBBBBCCDDDEFFFBBBGGDDFHBBGGGI'
                                                  'DDHHHBGGGIDDHHHHHGIIJJHH'
                                                  'HHHGJJJJHHHHHHJJJJ')
-csp = backtracking_search(grid, grid_length)
+csp = backtrack(grid, grid_length)
 if csp:
-    print('Star values: {0}'.format(csp.star_values))
+    print('\nSolution found!')
+    print('\nStar positions: {0}'.format(csp.star_values))
     print('Number of states checked: {0}'.format(total_states))
     display_grid(grid, grid_length, csp.star_values)
 else:

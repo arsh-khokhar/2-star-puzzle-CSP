@@ -15,10 +15,13 @@ class Csp:
     def __init__(self, grid_size: int, blocks: list):
         self.grid_size = grid_size
         self.blocks = blocks
-        self.cells = {}
-        for i, block in enumerate(blocks):
+        
+        # dictionary to map each cell to a block
+        # This would significantly reduce the block lookups later
+        self.cell_block_map = {}
+        for block_index, block in enumerate(blocks):
             for cell in block:
-                self.cells[cell] = i
+                self.cell_block_map[cell] = block_index
 
         self.star_values = []  # star 0,1 are in row 1, 2,3 in row 2 etc,
         
@@ -26,8 +29,11 @@ class Csp:
             self.star_values.append(-1)
 
         self.star_domains = []
+        # initialize domains for each star as its row
         for i in range(len(self.star_values)):
-            self.star_domains.insert(i, self.calculate_row_indices(i))
+            self.star_domains.insert(i, list(
+            range((int(i/2)) * self.grid_size + 1,
+            (int(i/2) + 1) * self.grid_size + 1)))
         
         self.unassigned_stars = list(range(grid_size*2)) # indices of unassigned stars for forward-check. Initially all stars are unassigned
 
@@ -35,7 +41,6 @@ class Csp:
         self.column_occupancy = [0]*grid_size  # column occupancy, ranging from 0 to 2. If 2, the column is fully occupied
         
         self.num_stars_assigned = 0
-        self.domain_wipeout = False
         self.complete_csp = False
         self.next_star_to_assign = 0
 
@@ -44,31 +49,20 @@ class Csp:
         Set star_values[star_num] to value, update other variables
 
         :param star_num: Star to be assigned value
-        :param value: Value to assign
+        :param value: value to assign
         """
         if self.star_values[star_num] == -1:
             self.column_occupancy[value % self.grid_size] += 1
-            self.block_occupancy[self.cells[value]] += 1 
+            self.block_occupancy[self.cell_block_map[value]] += 1 
             self.star_values[star_num] = value
             self.next_star_to_assign = star_num + 1
             self.num_stars_assigned += 1
-            self.unassigned_stars.remove(star_num)
+            self.safe_remove(self.unassigned_stars, star_num)
         else:
             print('Attempting to assign a cell that is already assigned')
 
         if self.num_stars_assigned == 2 * self.grid_size:
             self.complete_csp = True
-
-    def calculate_row_indices(self, star_num: int):
-        return list(
-            range((int(star_num/2)) * self.grid_size + 1,
-            (int(star_num/2) + 1) * self.grid_size + 1))
-    
-    def calculate_col_indices(self, star_value: int):
-        return list(
-            range(star_value % self.grid_size, 
-            self.grid_size*(self.grid_size - 1) + star_value % self.grid_size + 1, 
-            self.grid_size))
 
     def unassign_value(self, star_num: int):
         """
@@ -78,7 +72,7 @@ class Csp:
         """
         if self.star_values[star_num] != -1:
             value = self.star_values[star_num]
-            self.block_occupancy[self.cells[value]] -= 1
+            self.block_occupancy[self.cell_block_map[value]] -= 1
             self.column_occupancy[value % self.grid_size] -= 1
             self.star_values[star_num] = -1
             self.next_star_to_assign = star_num
@@ -88,44 +82,46 @@ class Csp:
             print('Attempting to unassign a cell that is already unassigned')
     
     def propogate_constraints(self, star_num: int):
+        """
+        Propogate constraints based on the currently assigned star
+
+        :param star_num: index of the star just assigned that will affect other stars' domains
+        :return: False if domain wipeout (dead end) is detected, false otherwise
+        """
         value = self.star_values[star_num]
-        # First star in the row, so the domain of next star in the row can be reduced for adjacency if it is unassigned
         for star in self.unassigned_stars:
-            domain = self.star_domains[star]            
-            
-            #  removing adjacent cells from domain, if any
-            self.safe_remove(domain, value) # the cell itself
-            self.safe_remove(domain, value - self.grid_size) # top cell
-            self.safe_remove(domain, value + self.grid_size) # bottom cell
+            domain = self.star_domains[star]
+            for cell in domain[:]:    
+                
+                # since value is now occupied, it needs to get deleted from the domains of
+                # remaining stars 
+                if cell == value:
+                    self.safe_remove(domain, cell)
+                
+                # remaining stars cannot be adjacent to value, so update domains accordingly
+                if self.are_adjacent(cell, value):
+                    self.safe_remove(domain, cell)
+                
+                # column occupancy constraint
+                # check if the column is filled after putting value 
+                # and update the remaining domains accordingly
+                if self.column_occupancy[value % self.grid_size] >= 2 and \
+                    self.same_col(cell, value):
+                    self.safe_remove(domain, cell)
 
-            if value % self.grid_size != 0:
-                self.safe_remove(domain, value + 1) # right cell
-                self.safe_remove(domain, value - self.grid_size + 1) # top-right cell
-                self.safe_remove(domain, value + self.grid_size + 1) # bottom-right cell
-            
-            if value % self.grid_size != 1:
-                self.safe_remove(domain, value - 1) # left cell
-                self.safe_remove(domain, value - self.grid_size - 1) # top-left cell
-                self.safe_remove(domain, value + self.grid_size - 1) # bottom-left cell
+                # block occupancy constraint
+                # cell_block_map[value] gives the index of block the value is in,
+                # and the occupancy for the block at this index is checked
+                if self.block_occupancy[self.cell_block_map[value]] >= 2 and \
+                    self.same_block(cell, value):
+                    self.safe_remove(domain, cell)
 
-            # column occupancy constraint
-            if self.column_occupancy[value % self.grid_size] >= 2:
-                for cell in domain[:]:
-                    if cell % self.grid_size == value % self.grid_size:
-                        self.safe_remove(domain, cell)
-            
-            # block occupancy constraint
-            if self.block_occupancy[self.cells[value]] >= 2:
-                for cell in domain[:]:
-                    if cell in self.blocks[self.cells[value]]:
-                        self.safe_remove(domain, cell)
-
-            # detect domain wipeout
-            if len(domain) == 0: 
-                return False
+                # detect domain wipeout
+                if len(domain) == 0:
+                    return False
 
         return True
-        
+
     def same_row(self, star1: int, star2: int):
         """
         Check to see if two stars are in the same row
@@ -154,14 +150,7 @@ class Csp:
         :param star2: Second star to be compared
         :return: True if the stars are in the same block, False otherwise
         """
-        for block in self.blocks:
-            if star1 in block and star2 in block:
-                return True
-            # a star can only be in one block, so if we find the block of one
-            # star but not the other, they must be in different blocks
-            elif star1 in block or star2 in block:
-                return False
-        return False
+        return self.cell_block_map[star1] == self.cell_block_map[star2]
 
     def are_adjacent(self, star1: int, star2: int):
         """
@@ -171,42 +160,35 @@ class Csp:
         :param star2: Second star to be compared
         :return: True if the stars are adjacent, False otherwise
         """
-        # check for wrap around
-        if not (star1 % self.grid_size == 0
-                and star2 % self.grid_size == 1) \
-                and not (star1 % self.grid_size == 1
-                         and star2 % self.grid_size == 0):
-            # star2 is above star1
-            if int((star1-1)/self.grid_size) - 1 \
-                    == int((star2-1)/self.grid_size):
-                return self.are_adjacent_helper(star1, star2)
-            # star2 is one the same row as star1
-            if int((star1 - 1) / self.grid_size) \
-                    == int((star2 - 1) / self.grid_size):
-                return self.are_adjacent_helper(star1, star2)
-            # star2 is below star1
-            if int((star1 - 1) / self.grid_size) + 1 \
-                    == int((star2 - 1) / self.grid_size):
-                return self.are_adjacent_helper(star1, star2)
-        return False
+        # return statements can be removed heavily, but kept this
+        #   for now for better readability
+        if star1 == star2:  # same cell
+           return True
+        if star1 == star2 - self.grid_size: # star2 on top
+            return True
+        if star1 == star2 + self.grid_size: # star2 on bottom
+            return True
+        
+        # check that star1 is not on right edge
+        if star1 % self.grid_size != 0:
+            # can safely detect the right neighbors here
+            if star1 == star2 - 1:  # star2 on right
+                return True
+            if star1 == star2 - self.grid_size - 1: # star2 on top-right
+                return True
+            if star1 == star2 + self.grid_size - 1: # star2 on bottom-right
+                return True
+        
+        # check that star1 is not on left edge
+        if star1 % self.grid_size != 1:
+            # can safely detect the left neighbors here
+            if star1 == star2 + 1:  # star2 on left
+                return True
+            if star1 == star2 - self.grid_size + 1: # star2 on top-left
+                return True
+            if star1 == star2 + self.grid_size + 1: # star2 on bottom-left
+                return True
 
-    def are_adjacent_helper(self, star1: int, star2: int):
-        """
-        Check to see if two stars are adjacent to each other.
-
-        :param star1: First star to be compared
-        :param star2: Second star to be compared
-        :return: True if the stars columns are the same or near, False otherwise
-        """
-        # star2 is in the same column as star1
-        if star1 % self.grid_size == star2 % self.grid_size:
-            return True
-        # star2 is to the right of star1
-        elif star1 % self.grid_size == (star2 % self.grid_size) - 1:
-            return True
-        # star2 is to the left of star1
-        elif star1 % self.grid_size == (star2 % self.grid_size) + 1:
-            return True
         return False
 
     def is_valid(self, grid_index: int):

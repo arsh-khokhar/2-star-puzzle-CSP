@@ -9,7 +9,7 @@ curr_print_threshold = 0
 PRINT_THRESHOLD_INCREMENT = 100000
 
 
-def backtracking_with_fc(blocks: list, grid_size: int):
+def forward_check(blocks: list, grid_size: int):
     """
     Helper method for recursive_backtracking_search
 
@@ -21,13 +21,13 @@ def backtracking_with_fc(blocks: list, grid_size: int):
     total_states = 0
     curr_print_threshold = PRINT_THRESHOLD_INCREMENT
     start = datetime.datetime.now()
-    result = recursive_backtracking_with_fc(Csp(grid_size, blocks))
+    result = recursive_forward_check(Csp(grid_size, blocks))
     end = datetime.datetime.now()
     print('\nEvaluation took: {0}'.format(end - start))
     return result
 
 
-def recursive_backtracking_with_fc(csp: Csp):
+def recursive_forward_check(csp: Csp):
     """
     Implements backtracking search to solve a given Constraint Satisfaction
     Problem
@@ -50,7 +50,7 @@ def recursive_backtracking_with_fc(csp: Csp):
                csp.star_domains = [x[:] for x in domains_copy]
                csp.unassign_value(curr)
                return None
-            result = recursive_backtracking_with_fc(csp)
+            result = recursive_forward_check(csp)
             if result:
                 return result
             csp.star_domains = [x[:] for x in domains_copy] # to make a deepcopy of the stuff
@@ -67,7 +67,8 @@ grid, grid_length = convert_string_to_grid_array('ABBBCDDDEEABBBCDDEEEAABBCCDDD'
                                                  'EBBBBCCDDDEFFFBBBGGDDFHBBGGGI'
                                                  'DDHHHBGGGIDDHHHHHGIIJJHH'
                                                  'HHHGJJJJHHHHHHJJJJ')
-csp = backtracking_with_fc(grid, grid_length)
+
+csp = forward_check(grid, grid_length)
 if csp:
     print('\nSolution found!')
     print('\nStar positions: {0}'.format(csp.star_values))
