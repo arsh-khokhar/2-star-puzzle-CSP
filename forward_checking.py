@@ -69,10 +69,7 @@ def recursive_forward_check(csp: Csp):
 
 
 # temporary test code, will be moved eventually
-grid, grid_length = convert_string_to_grid_array('ABBBCDDDEEABBBCDDEEEAABBCCDDD'
-                                                 'EBBBBCCDDDEFFFBBBGGDDFHBBGGGI'
-                                                 'DDHHHBGGGIDDHHHHHGIIJJHH'
-                                                 'HHHGJJJJHHHHHHJJJJ')
+grid, grid_length = convert_string_to_grid_array('AAAAAAABBBAAAACCBBBBDDDACCCCBBDDDECEFCCBDDEEEEFCGGDEEEEEFGGGEEHHEEGGGIEEEHEEEGGIEJJHEEEJGIEJJJJJJJJJ')
 
 csp = forward_check(grid, grid_length)
 if csp:

@@ -42,8 +42,8 @@ def recursive_backtrack(csp: Csp):
     domains_copy = [x[:] for x in csp.star_domains]  # to make a deepcopy of the stuff
     domain_min_size_copy = csp.min_domain_size
     domain_min_num_copy = csp.min_domain_num
-    # curr = csp.next_star_to_assign
-    curr = csp.min_domain_num  # heuristic 1
+    curr = csp.next_star_to_assign
+    # curr = csp.min_domain_num  # heuristic 1
     for value in csp.star_domains[curr]:
         total_states += 1
         if csp.is_valid(value):
@@ -63,10 +63,7 @@ def recursive_backtrack(csp: Csp):
 
 
 # temporary test code, will be moved eventually
-grid, grid_length = convert_string_to_grid_array('ABBBCDDDEEABBBCDDEEEAABBCCDDD'
-                                                 'EBBBBCCDDDEFFFBBBGGDDFHBBGGGI'
-                                                 'DDHHHBGGGIDDHHHHHGIIJJHH'
-                                                 'HHHGJJJJHHHHHHJJJJ')
+grid, grid_length = convert_string_to_grid_array('AAAAAAABBBAAAACCBBBBDDDACCCCBBDDDECEFCCBDDEEEEFCGGDEEEEEFGGGEEHHEEGGGIEEEHEEEGGIEJJHEEEJGIEJJJJJJJJJ')
 csp = backtrack(grid, grid_length)
 if csp:
     print('\nSolution found!')

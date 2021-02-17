@@ -7,8 +7,10 @@ class Csp:
         blocks              2D array representing the blocks of the grid
         star_values         Current csp of grid positions to stars,
                             index 0,1 are for row 1, 2,3 for row 2,etc.
-        complete_csp True when every star has a value, False otherwise
+        complete_csp        True when every star has a value, False otherwise
         next_star_to_assign Next star to assign (without heuristic)
+        min_domain_num      Of current unassigned stars, what is the smallest domain
+        min_domain_size     Size of the min_domain_num domain
     """
 
     def __init__(self, grid_size: int, blocks: list):
@@ -43,7 +45,7 @@ class Csp:
         self.next_star_to_assign = 0
 
         self.min_domain_num = 0
-        self.min_domain_size = 10
+        self.min_domain_size = grid_size
 
     def assign_value(self, star_num: int, value: int):
         """
@@ -123,8 +125,11 @@ class Csp:
                 curr_min_domain_size = len(domain)
                 curr_min_domain_num = star
 
-        self.min_domain_size = curr_min_domain_size
-        self.min_domain_num = curr_min_domain_num
+            if curr_min_domain_size == 0:
+                self.min_domain_size = curr_min_domain_size
+                self.min_domain_num = curr_min_domain_num
+                # return since we'll reassign domains from copies anyway
+                return None
 
     def same_row(self, star1: int, star2: int):
         """
