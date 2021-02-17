@@ -40,20 +40,26 @@ def recursive_forward_check(csp: Csp):
         return csp
 
     domains_copy = [x[:] for x in csp.star_domains] # to make a deepcopy of the stuff
-    curr = csp.next_star_to_assign
+    domain_min_size_copy = csp.min_domain_size
+    domain_min_num_copy = csp.min_domain_num
+    # curr = csp.next_star_to_assign
+    curr = csp.min_domain_num  # heuristic 1
     for value in csp.star_domains[curr]:
         total_states += 1
         if csp.is_valid(value):
             csp.assign_value(curr, value)
+            csp.propogate_constraints(curr)
             # need to check if there was a domain wipeout
-            if not csp.propogate_constraints(curr):
-               csp.star_domains = [x[:] for x in domains_copy]
-               csp.unassign_value(curr)
-               return None
+            if csp.min_domain_size == 0:
+                csp.star_domains = [x[:] for x in domains_copy]
+                csp.unassign_value(curr)
+                return None
             result = recursive_forward_check(csp)
             if result:
                 return result
             csp.star_domains = [x[:] for x in domains_copy] # to make a deepcopy of the stuff
+            csp.min_domain_size = domain_min_size_copy
+            csp.min_domain_num = domain_min_num_copy
             csp.unassign_value(curr)
             
     if total_states >= curr_print_threshold:

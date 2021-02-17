@@ -39,14 +39,22 @@ def recursive_backtrack(csp: Csp):
     if csp.complete_csp:
         return csp
 
-    curr = csp.next_star_to_assign
+    domains_copy = [x[:] for x in csp.star_domains]  # to make a deepcopy of the stuff
+    domain_min_size_copy = csp.min_domain_size
+    domain_min_num_copy = csp.min_domain_num
+    # curr = csp.next_star_to_assign
+    curr = csp.min_domain_num  # heuristic 1
     for value in csp.star_domains[curr]:
         total_states += 1
         if csp.is_valid(value):
             csp.assign_value(curr, value)
+            csp.propogate_constraints(curr)
             result = recursive_backtrack(csp)
             if result:
                 return result
+            csp.star_domains = [x[:] for x in domains_copy]  # to make a deepcopy of the stuff
+            csp.min_domain_size = domain_min_size_copy
+            csp.min_domain_num = domain_min_num_copy
             csp.unassign_value(curr)
     if total_states >= curr_print_threshold:
         print('Checked {0} states so far'.format(total_states))

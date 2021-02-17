@@ -42,6 +42,9 @@ class Csp:
         self.complete_csp = False
         self.next_star_to_assign = 0
 
+        self.min_domain_num = 0
+        self.min_domain_size = 10
+
     def assign_value(self, star_num: int, value: int):
         """
         Set star_values[star_num] to value, update other variables
@@ -84,10 +87,14 @@ class Csp:
         :param star_num: index of the star just assigned that will affect other stars' domains
         :return: False if domain wipeout (dead end) is detected, false otherwise
         """
+        curr_min_domain_size = 100000
+        curr_min_domain_num = -1
         value = self.star_values[star_num]
         for star in self.unassigned_stars:
+            if star == star_num:
+                continue
             domain = self.star_domains[star]
-            for cell in domain[:]:    
+            for cell in domain[:]:
                 
                 # since value is now occupied, it needs to get deleted from the domains of
                 # remaining stars 
@@ -112,11 +119,12 @@ class Csp:
                     self.same_block(cell, value):
                     self.safe_remove(domain, cell)
 
-                # detect domain wipeout
-                if len(domain) == 0:
-                    return False
+            if len(domain) < curr_min_domain_size:
+                curr_min_domain_size = len(domain)
+                curr_min_domain_num = star
 
-        return True
+        self.min_domain_size = curr_min_domain_size
+        self.min_domain_num = curr_min_domain_num
 
     def same_row(self, star1: int, star2: int):
         """
