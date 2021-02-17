@@ -7,7 +7,6 @@ class Csp:
         blocks              2D array representing the blocks of the grid
         star_values         Current csp of grid positions to stars,
                             index 0,1 are for row 1, 2,3 for row 2,etc.
-        num_stars_assigned  Number of stars assigned
         complete_csp True when every star has a value, False otherwise
         next_star_to_assign Next star to assign (without heuristic)
     """
@@ -39,8 +38,7 @@ class Csp:
 
         self.block_occupancy = [0]*len(blocks)  # block occupancy, ranging from 0 to 2. If 2, then block is fully occupied
         self.column_occupancy = [0]*grid_size  # column occupancy, ranging from 0 to 2. If 2, the column is fully occupied
-        
-        self.num_stars_assigned = 0
+
         self.complete_csp = False
         self.next_star_to_assign = 0
 
@@ -56,12 +54,11 @@ class Csp:
             self.block_occupancy[self.cell_block_map[value]] += 1 
             self.star_values[star_num] = value
             self.next_star_to_assign = star_num + 1
-            self.num_stars_assigned += 1
             self.safe_remove(self.unassigned_stars, star_num)
         else:
             print('Attempting to assign a cell that is already assigned')
 
-        if self.num_stars_assigned == 2 * self.grid_size:
+        if len(self.unassigned_stars) == 0:
             self.complete_csp = True
 
     def unassign_value(self, star_num: int):
@@ -76,7 +73,6 @@ class Csp:
             self.column_occupancy[value % self.grid_size] -= 1
             self.star_values[star_num] = -1
             self.next_star_to_assign = star_num
-            self.num_stars_assigned -= 1
             self.unassigned_stars.append(star_num)
         else:
             print('Attempting to unassign a cell that is already unassigned')
