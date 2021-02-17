@@ -1,4 +1,4 @@
-from Csp import Csp
+from CSP import Csp
 from main import load_grid_file
 
 
@@ -38,23 +38,23 @@ TEST_POSSIBLE_VALUES = [(0, [1, 2, 3, 4, 5, 6, 7, 8]),
 TEST_ASSIGN_THEN_POSSIBLE_VALUES = [(6, 1, [1, 2, 3, 4, 8])]
 
 
-def test_possible_values():
+def test_star_domains():
     csp = init_csp()
     for star_num, expected_list in TEST_POSSIBLE_VALUES:
-        if not bool(set(csp.possible_values(star_num))
+        if not bool(set(csp.star_domains[star_num])
                             .intersection(expected_list)):
             raise Exception("The case {0},{1} evaluated to {2}"
                             .format(star_num, expected_list,
-                                    csp.possible_values(star_num)))
+                                    csp.star_domains[star_num]))
 
     for value_to_assign, star_num, expected_list in \
             TEST_ASSIGN_THEN_POSSIBLE_VALUES:
         csp.star_values[0] = value_to_assign
-        if not bool(set(csp.possible_values(star_num))
+        if not bool(set(csp.star_domains[star_num])
                             .intersection(expected_list)):
             raise Exception("The case {0},{1} evaluated to {2}"
                             .format(star_num, expected_list,
-                                    csp.possible_values(star_num)))
+                                    csp.star_domains[star_num]))
         csp.star_values[0] = -1
 
 
