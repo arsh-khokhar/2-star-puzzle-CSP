@@ -29,7 +29,7 @@ class Csp:
         for i in range(len(self.star_values)):
             self.star_domains.insert(i, self.calculate_row_indices(i))
         
-        self.unassigned_stars = list(range(grid_size*2)) # indices of unassigned stars. This bookkeeping would help in forward-check. initially all stars are unassigned
+        self.unassigned_stars = list(range(grid_size*2)) # indices of unassigned stars for forward-check. Initially all stars are unassigned
 
         self.block_occupancy = [0]*len(blocks)  # block occupancy, ranging from 0 to 2. If 2, then block is fully occupied
         self.column_occupancy = [0]*grid_size  # column occupancy, ranging from 0 to 2. If 2, the column is fully occupied
@@ -86,33 +86,6 @@ class Csp:
             self.unassigned_stars.append(star_num)
         else:
             print('Attempting to unassign a cell that is already unassigned')
-
-    # def possible_values(self, star_num: int):
-    #     """
-    #     Get possible values that star_values[star_num] can take, a star can
-    #     take any value in it's own row, except for ones taken by the other
-    #     star in it's own row and the spaces beside it.
-
-    #     :param star_num: Star to get possible values for
-    #     :return: Array of possible grid indexes for star_values[star_num]
-    #     """
-    #     the_possible_values = list(
-    #         range((int(star_num/2)) * self.grid_size + 1,
-    #         (int(star_num/2) + 1) * self.grid_size + 1))
-        
-    #     # if star_num % 2 == 1:
-    #     #     try:
-    #     #         the_possible_values.remove(self.star_values[star_num - 1])
-    #     #         the_possible_values.remove(self.star_values[star_num - 1] + 1)
-    #     #         the_possible_values.remove(self.star_values[star_num - 1] - 1)
-    #     #     except ValueError:
-    #     #         # if we try to remove an element not in the list, don't do anything
-    #     #         pass
-        
-    #     return the_possible_values
-
-    def possible_values(self, star_num: int):
-        return self.star_domains[star_num]
     
     def propogate_constraints(self, star_num: int):
         value = self.star_values[star_num]
@@ -147,20 +120,11 @@ class Csp:
                     if cell in self.blocks[self.cells[value]]:
                         self.safe_remove(domain, cell)
 
+            # detect domain wipeout
             if len(domain) == 0: 
-                # detect domain wipeout
                 return False
 
         return True
-
-        # if star_num % 2 == 0 and self.star_values[star_num + 1] == -1:
-        #     try:
-        #         self.star_domains[star_num + 1].remove(value - 1)
-        #         self.star_domains[star_num + 1].remove(value)
-        #         self.star_domains[star_num + 1].remove(value + 1)
-        #     except ValueError:
-        #         # if we try to remove an element not in the list, don't do anything
-        #         pass
         
     def same_row(self, star1: int, star2: int):
         """
@@ -274,9 +238,16 @@ class Csp:
                     return False
         return True
 
-    def safe_remove(self, input_list: list, toRemove: int):
+    def safe_remove(self, input_list: list, to_remove: int):
+        """
+        Attempt removing an element from a list without throwing any exceptions
+        if the element was not found
+
+        :param input_list: list from which the element has to be removed
+        :param to_remove: element to be removed
+        """
         try:
-            input_list.remove(toRemove)
+            input_list.remove(to_remove)
         except ValueError:
             # if we try to remove an element not in the list, don't do anything
             pass

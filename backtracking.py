@@ -39,7 +39,7 @@ def recursive_backtracking_search(csp: Csp):
         return csp
 
     curr = csp.next_star_to_assign
-    for value in csp.possible_values(curr):
+    for value in csp.star_domains[curr]:
         total_states += 1
         if csp.is_valid(value):
             csp.assign_value(curr, value)
