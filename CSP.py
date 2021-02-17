@@ -15,10 +15,27 @@ class Csp:
     def __init__(self, grid_size: int, blocks: list):
         self.grid_size = grid_size
         self.blocks = blocks
+        self.cells = {}
+        for i, block in enumerate(blocks):
+            for cell in block:
+                self.cells[cell] = i
+
         self.star_values = []  # star 0,1 are in row 1, 2,3 in row 2 etc,
+        
         for i in range(grid_size * 2):
             self.star_values.append(-1)
+
+        self.star_domains = []
+        for i in range(len(self.star_values)):
+            self.star_domains.insert(i, self.calculate_row_indices(i))
+        
+        self.unassigned_stars = list(range(grid_size*2)) # indices of unassigned stars. This bookkeeping would help in forward-check. initially all stars are unassigned
+
+        self.block_occupancy = [0]*len(blocks)  # block occupancy, ranging from 0 to 2. If 2, then block is fully occupied
+        self.column_occupancy = [0]*grid_size  # column occupancy, ranging from 0 to 2. If 2, the column is fully occupied
+        
         self.num_stars_assigned = 0
+        self.domain_wipeout = False
         self.complete_csp = False
         self.next_star_to_assign = 0
 
@@ -30,14 +47,28 @@ class Csp:
         :param value: Value to assign
         """
         if self.star_values[star_num] == -1:
+            self.column_occupancy[value % self.grid_size] += 1
+            self.block_occupancy[self.cells[value]] += 1 
             self.star_values[star_num] = value
             self.next_star_to_assign = star_num + 1
             self.num_stars_assigned += 1
+            self.unassigned_stars.remove(star_num)
         else:
-            print('Attempting to assign a row that is already fully assigned')
+            print('Attempting to assign a cell that is already assigned')
 
         if self.num_stars_assigned == 2 * self.grid_size:
             self.complete_csp = True
+
+    def calculate_row_indices(self, star_num: int):
+        return list(
+            range((int(star_num/2)) * self.grid_size + 1,
+            (int(star_num/2) + 1) * self.grid_size + 1))
+    
+    def calculate_col_indices(self, star_value: int):
+        return list(
+            range(star_value % self.grid_size, 
+            self.grid_size*(self.grid_size - 1) + star_value % self.grid_size + 1, 
+            self.grid_size))
 
     def unassign_value(self, star_num: int):
         """
@@ -46,37 +77,91 @@ class Csp:
         :param star_num: Star to be assigned value
         """
         if self.star_values[star_num] != -1:
+            value = self.star_values[star_num]
+            self.block_occupancy[self.cells[value]] -= 1
+            self.column_occupancy[value % self.grid_size] -= 1
             self.star_values[star_num] = -1
             self.next_star_to_assign = star_num
             self.num_stars_assigned -= 1
+            self.unassigned_stars.append(star_num)
         else:
-            print('Attempting to unassign a row that is already fully '
-                  'unassigned')
+            print('Attempting to unassign a cell that is already unassigned')
+
+    # def possible_values(self, star_num: int):
+    #     """
+    #     Get possible values that star_values[star_num] can take, a star can
+    #     take any value in it's own row, except for ones taken by the other
+    #     star in it's own row and the spaces beside it.
+
+    #     :param star_num: Star to get possible values for
+    #     :return: Array of possible grid indexes for star_values[star_num]
+    #     """
+    #     the_possible_values = list(
+    #         range((int(star_num/2)) * self.grid_size + 1,
+    #         (int(star_num/2) + 1) * self.grid_size + 1))
+        
+    #     # if star_num % 2 == 1:
+    #     #     try:
+    #     #         the_possible_values.remove(self.star_values[star_num - 1])
+    #     #         the_possible_values.remove(self.star_values[star_num - 1] + 1)
+    #     #         the_possible_values.remove(self.star_values[star_num - 1] - 1)
+    #     #     except ValueError:
+    #     #         # if we try to remove an element not in the list, don't do anything
+    #     #         pass
+        
+    #     return the_possible_values
 
     def possible_values(self, star_num: int):
-        """
-        Get possible values that star_values[star_num] can take, a star can
-        take any value in it's own row, except for ones taken by the other
-        star in it's own row and the spaces beside it.
+        return self.star_domains[star_num]
+    
+    def propogate_constraints(self, star_num: int):
+        value = self.star_values[star_num]
+        # First star in the row, so the domain of next star in the row can be reduced for adjacency if it is unassigned
+        for star in self.unassigned_stars:
+            domain = self.star_domains[star]            
+            
+            #  removing adjacent cells from domain, if any
+            self.safe_remove(domain, value) # the cell itself
+            self.safe_remove(domain, value - self.grid_size) # top cell
+            self.safe_remove(domain, value + self.grid_size) # bottom cell
 
-        :param star_num: Star to get possible values for
-        :return: Array of possible grid indexes for star_values[star_num]
-        """
-        the_possible_values = list(
-            range((int(star_num/2)) * self.grid_size + 1,
-            (int(star_num/2) + 1) * self.grid_size + 1))
+            if value % self.grid_size != 0:
+                self.safe_remove(domain, value + 1) # right cell
+                self.safe_remove(domain, value - self.grid_size + 1) # top-right cell
+                self.safe_remove(domain, value + self.grid_size + 1) # bottom-right cell
+            
+            if value % self.grid_size != 1:
+                self.safe_remove(domain, value - 1) # left cell
+                self.safe_remove(domain, value - self.grid_size - 1) # top-left cell
+                self.safe_remove(domain, value + self.grid_size - 1) # bottom-left cell
 
-        if star_num % 2 == 1:
-            try:
-                the_possible_values.remove(self.star_values[star_num - 1])
-                the_possible_values.remove(self.star_values[star_num - 1] + 1)
-                the_possible_values.remove(self.star_values[star_num - 1] - 1)
-            except ValueError:
-                # if we try to remove an element not in the list, don't do anything
-                pass
+            # column occupancy constraint
+            if self.column_occupancy[value % self.grid_size] >= 2:
+                for cell in domain[:]:
+                    if cell % self.grid_size == value % self.grid_size:
+                        self.safe_remove(domain, cell)
+            
+            # block occupancy constraint
+            if self.block_occupancy[self.cells[value]] >= 2:
+                for cell in domain[:]:
+                    if cell in self.blocks[self.cells[value]]:
+                        self.safe_remove(domain, cell)
 
-        return the_possible_values
+            if len(domain) == 0: 
+                # detect domain wipeout
+                return False
 
+        return True
+
+        # if star_num % 2 == 0 and self.star_values[star_num + 1] == -1:
+        #     try:
+        #         self.star_domains[star_num + 1].remove(value - 1)
+        #         self.star_domains[star_num + 1].remove(value)
+        #         self.star_domains[star_num + 1].remove(value + 1)
+        #     except ValueError:
+        #         # if we try to remove an element not in the list, don't do anything
+        #         pass
+        
     def same_row(self, star1: int, star2: int):
         """
         Check to see if two stars are in the same row
@@ -188,3 +273,10 @@ class Csp:
                         or num_in_block >= 2:
                     return False
         return True
+
+    def safe_remove(self, input_list: list, toRemove: int):
+        try:
+            input_list.remove(toRemove)
+        except ValueError:
+            # if we try to remove an element not in the list, don't do anything
+            pass

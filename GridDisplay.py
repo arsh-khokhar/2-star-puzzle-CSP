@@ -19,7 +19,7 @@ def display_grid(blocks: list, grid_length: int, star_locs: list = None,
     """
 
     # Create figure and axes
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(7, 7))
 
     # create grid
     for x in range(grid_length + 1):
