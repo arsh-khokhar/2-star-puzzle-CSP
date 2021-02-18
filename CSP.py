@@ -131,6 +131,9 @@ class Csp:
                 # return since we'll reassign domains from copies anyway
                 return None
 
+        self.min_domain_size = curr_min_domain_size
+        self.min_domain_num = curr_min_domain_num
+
     def same_row(self, star1: int, star2: int):
         """
         Check to see if two stars are in the same row
