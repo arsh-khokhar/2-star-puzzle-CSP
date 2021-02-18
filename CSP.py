@@ -1,3 +1,6 @@
+import random
+
+
 class Csp:
     """
     An csp of stars to spaces on a grid
@@ -81,58 +84,53 @@ class Csp:
             self.unassigned_stars.append(star_num)
         else:
             print('Attempting to unassign a cell that is already unassigned')
-    
-    def propogate_constraints(self, star_num: int):
+
+    def propogate_constraints(self, star_num: int, value: int):
         """
         Propogate constraints based on the currently assigned star
 
         :param star_num: index of the star just assigned that will affect other stars' domains
         :return: False if domain wipeout (dead end) is detected, false otherwise
         """
-        curr_min_domain_size = 100000
-        curr_min_domain_num = -1
-        value = self.star_values[star_num]
+        domain_size_dict = {}
         for star in self.unassigned_stars:
             if star == star_num:
                 continue
             domain = self.star_domains[star]
             for cell in domain[:]:
-                
+
                 # since value is now occupied, it needs to get deleted from the domains of
                 # remaining stars 
                 if cell == value:
                     self.safe_remove(domain, cell)
-                
+
                 # remaining stars cannot be adjacent to value, so update domains accordingly
                 if self.are_adjacent(cell, value):
                     self.safe_remove(domain, cell)
-                
+
                 # column occupancy constraint
                 # check if the column is filled after putting value 
                 # and update the remaining domains accordingly
                 if self.column_occupancy[value % self.grid_size] >= 2 and \
-                    self.same_col(cell, value):
+                        self.same_col(cell, value):
                     self.safe_remove(domain, cell)
 
                 # block occupancy constraint
                 # cell_block_map[value] gives the index of block the value is in,
                 # and the occupancy for the block at this index is checked
                 if self.block_occupancy[self.cell_block_map[value]] >= 2 and \
-                    self.same_block(cell, value):
+                        self.same_block(cell, value):
                     self.safe_remove(domain, cell)
 
-            if len(domain) < curr_min_domain_size:
-                curr_min_domain_size = len(domain)
-                curr_min_domain_num = star
+            domain_size_dict[star] = len(domain)
 
-            if curr_min_domain_size == 0:
-                self.min_domain_size = curr_min_domain_size
-                self.min_domain_num = curr_min_domain_num
-                # return since we'll reassign domains from copies anyway
-                return None
+        if len(self.unassigned_stars) > 0:
+            min_value = min(domain_size_dict.values())
+            keys = [key for key, value in domain_size_dict.items() if value == min_value]
+            chosen_min = random.choice(keys)
 
-        self.min_domain_size = curr_min_domain_size
-        self.min_domain_num = curr_min_domain_num
+            self.min_domain_size = domain_size_dict[chosen_min]
+            self.min_domain_num = chosen_min
 
     def same_row(self, star1: int, star2: int):
         """
@@ -142,7 +140,7 @@ class Csp:
         :param star2: Second star to be compared
         :return: True if the stars are in the same row, False otherwise
         """
-        return int((star1-1)/self.grid_size) == int((star2-1)/self.grid_size)
+        return int((star1 - 1) / self.grid_size) == int((star2 - 1) / self.grid_size)
 
     def same_col(self, star1: int, star2: int):
         """
@@ -175,30 +173,30 @@ class Csp:
         # return statements can be removed heavily, but kept this
         #   for now for better readability
         if star1 == star2:  # same cell
-           return True
-        if star1 == star2 - self.grid_size: # star2 on top
             return True
-        if star1 == star2 + self.grid_size: # star2 on bottom
+        if star1 == star2 - self.grid_size:  # star2 on top
             return True
-        
+        if star1 == star2 + self.grid_size:  # star2 on bottom
+            return True
+
         # check that star1 is not on right edge
         if star1 % self.grid_size != 0:
             # can safely detect the right neighbors here
             if star1 == star2 - 1:  # star2 on right
                 return True
-            if star1 == star2 - self.grid_size - 1: # star2 on top-right
+            if star1 == star2 - self.grid_size - 1:  # star2 on top-right
                 return True
-            if star1 == star2 + self.grid_size - 1: # star2 on bottom-right
+            if star1 == star2 + self.grid_size - 1:  # star2 on bottom-right
                 return True
-        
+
         # check that star1 is not on left edge
         if star1 % self.grid_size != 1:
             # can safely detect the left neighbors here
             if star1 == star2 + 1:  # star2 on left
                 return True
-            if star1 == star2 - self.grid_size + 1: # star2 on top-left
+            if star1 == star2 - self.grid_size + 1:  # star2 on top-left
                 return True
-            if star1 == star2 + self.grid_size + 1: # star2 on bottom-left
+            if star1 == star2 + self.grid_size + 1:  # star2 on bottom-left
                 return True
 
         return False
@@ -231,6 +229,39 @@ class Csp:
                         or num_in_block >= 2:
                     return False
         return True
+
+    def heuristic_two(self):
+        domain_size_diff_dict = {}
+
+        original_domain_sizes_sum = self.sum_of_domain_sizes()
+        domain_min_size_copy = self.min_domain_size
+        domain_min_num_copy = self.min_domain_num
+        for star in self.unassigned_stars:
+            domain = self.star_domains[star]
+            curr_domain_sizes_reduction = 0
+            for cell in domain:
+                domains_copy = [x[:] for x in self.star_domains]
+                self.propogate_constraints(star, cell)
+                curr_domain_sizes_reduction += original_domain_sizes_sum \
+                                               - self.sum_of_domain_sizes()
+                self.star_domains = [x[:] for x in domains_copy]
+            domain_size_diff_dict[star] = curr_domain_sizes_reduction
+
+        self.min_domain_size = domain_min_size_copy
+        self.min_domain_num = domain_min_num_copy
+
+        if len(self.unassigned_stars) > 0:
+            max_value = max(domain_size_diff_dict.values())
+            keys = [key for key, value in domain_size_diff_dict.items() if value == max_value]
+            chosen_max = random.choice(keys)
+
+            return chosen_max
+
+    def sum_of_domain_sizes(self):
+        domain_sizes_sum = 0
+        for star in self.unassigned_stars:
+            domain_sizes_sum += len(self.star_domains[star])
+        return domain_sizes_sum
 
     def safe_remove(self, input_list: list, to_remove: int):
         """

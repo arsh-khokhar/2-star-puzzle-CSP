@@ -48,7 +48,7 @@ def recursive_backtrack(csp: Csp):
         total_states += 1
         if csp.is_valid(value):
             csp.assign_value(curr, value)
-            csp.propogate_constraints(curr)
+            csp.propogate_constraints(curr, value)
             result = recursive_backtrack(csp)
             if result:
                 return result
