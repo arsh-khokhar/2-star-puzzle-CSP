@@ -39,16 +39,17 @@ def recursive_forward_check(csp: Csp):
     if csp.complete_csp:
         return csp
 
-    domains_copy = [x[:] for x in csp.star_domains] # to make a deepcopy of the stuff
+    domains_copy = [x[:] for x in csp.star_domains]
     domain_min_size_copy = csp.min_domain_size
     domain_min_num_copy = csp.min_domain_num
     # curr = csp.next_star_to_assign
-    curr = csp.min_domain_num  # heuristic 1
+    # curr = csp.min_domain_num  # heuristic 1
+    curr = csp.heuristic_two()
     for value in csp.star_domains[curr]:
         total_states += 1
         if csp.is_valid(value):
             csp.assign_value(curr, value)
-            csp.propogate_constraints(curr)
+            csp.propogate_constraints(curr, value)
             # need to check if there was a domain wipeout
             if csp.min_domain_size == 0:
                 csp.star_domains = [x[:] for x in domains_copy]
@@ -57,7 +58,7 @@ def recursive_forward_check(csp: Csp):
             result = recursive_forward_check(csp)
             if result:
                 return result
-            csp.star_domains = [x[:] for x in domains_copy] # to make a deepcopy of the stuff
+            csp.star_domains = [x[:] for x in domains_copy]
             csp.min_domain_size = domain_min_size_copy
             csp.min_domain_num = domain_min_num_copy
             csp.unassign_value(curr)
@@ -69,7 +70,10 @@ def recursive_forward_check(csp: Csp):
 
 
 # temporary test code, will be moved eventually
-grid, grid_length = convert_string_to_grid_array('AAAAAAABBBAAAACCBBBBDDDACCCCBBDDDECEFCCBDDEEEEFCGGDEEEEEFGGGEEHHEEGGGIEEEHEEEGGIEJJHEEEJGIEJJJJJJJJJ')
+grid, grid_length = convert_string_to_grid_array('ABBBCDDDEEABBBCDDEEEAABBCCDDD'
+                                                 'EBBBBCCDDDEFFFBBBGGDDFHBBGGGI'
+                                                 'DDHHHBGGGIDDHHHHHGIIJJHH'
+                                                 'HHHGJJJJHHHHHHJJJJ')
 
 csp = forward_check(grid, grid_length)
 if csp:
