@@ -30,7 +30,7 @@ def recursive_forward_check(assignment, csp):
                 csp.unassign_val(var, value, assignment)
                 #csp.domains = {key: set(value) for key, value in my_copy.items()}
                 csp.restore_domains(removed_domains)
-                return None
+                continue
             result = recursive_forward_check(assignment, csp)
             if result:
                 return result
@@ -68,7 +68,7 @@ blocks, grid_size = convert_string_to_grid_array('AAABBBBBBBBDDD'
 start_time = time.time()
 
 # heuristic will come from args or something similar
-heuristic = 1
+heuristic = 0
 
 csp_assignment = forward_check(blocks, grid_size, heuristic)
 

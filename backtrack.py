@@ -69,7 +69,7 @@ blocks, grid_size = convert_string_to_grid_array('AAABBBBBBBBDDD'
 start_time = time.time()
 
 # heuristic will come from args or something similar
-heuristic = 1
+heuristic = 0
 
 csp_assignment = backtrack(blocks, grid_size, heuristic)
 
