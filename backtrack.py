@@ -1,74 +1,72 @@
-from GridDisplay import display_grid
-from CSP import Csp
+from csp import Csp
 from Examples.StringToGridArray import convert_string_to_grid_array
-import json
-import datetime
+from GridDisplay import display_grid
+import time
 
-total_states = 0
-curr_print_threshold = 0
-PRINT_THRESHOLD_INCREMENT = 100000
+checked_nodes = 0
 
+def backtrack(blocks, grid_size):
+    return recursive_backtrack({}, Csp(blocks, grid_size))
 
-def backtrack(blocks: list, grid_size: int):
-    """
-    Helper method for recursive_backtracking_search
-
-    :param blocks: 2D array representing the blocks of the grid
-    :param grid_size: Size of the grid (10x10 grid -> 10)
-    :return: The csp containing a solution if there is one, None otherwise
-    """
-    global total_states, curr_print_threshold
-    total_states = 0
-    curr_print_threshold = PRINT_THRESHOLD_INCREMENT
-    start = datetime.datetime.now()
-    result = recursive_backtrack(Csp(grid_size, blocks))
-    end = datetime.datetime.now()
-    print('Evaluation took: {0}'.format(end - start))
-    return result
-
-
-def recursive_backtrack(csp: Csp):
-    """
-    Implements backtracking search to solve a given Constraint Satisfaction
-    Problem
-
-    :param csp: CSP object
-    :return: The csp containing a solution if there is one, None otherwise
-    """
-    global total_states, curr_print_threshold
-    if csp.complete_csp:
-        return csp
-
-    domains_copy = [x[:] for x in csp.star_domains]  # to make a deepcopy of the stuff
-    domain_min_size_copy = csp.min_domain_size
-    domain_min_num_copy = csp.min_domain_num
-    curr = csp.next_star_to_assign
-    # curr = csp.min_domain_num  # heuristic 1
-    for value in csp.star_domains[curr]:
-        total_states += 1
-        if csp.is_valid(value):
-            csp.assign_value(curr, value)
-            csp.propogate_constraints(curr, value)
-            result = recursive_backtrack(csp)
+def recursive_backtrack(assignment, csp):
+    global checked_nodes
+    
+    if csp.is_complete(assignment):
+        return assignment
+    
+    var = csp.get_next_unassigned_var()
+    for value in csp.domains[var]:
+        checked_nodes += 1
+        if csp.is_consistent(value, assignment):
+            csp.assign_val(var, value, assignment) #assignment[var] = value
+            result = recursive_backtrack(assignment, csp)
             if result:
                 return result
-            csp.star_domains = [x[:] for x in domains_copy]  # to make a deepcopy of the stuff
-            csp.min_domain_size = domain_min_size_copy
-            csp.min_domain_num = domain_min_num_copy
-            csp.unassign_value(curr)
-    if total_states >= curr_print_threshold:
-        print('Checked {0} states so far'.format(total_states))
-        curr_print_threshold += PRINT_THRESHOLD_INCREMENT
+            csp.unassign_val(var, value, assignment) # deleting from the assignment
     return None
 
+# blocks = [[1, 11, 21, 22], 
+# [2, 3, 4, 12, 13, 14, 23, 24, 31, 32, 33, 34, 44, 45, 46, 53, 54, 64], 
+# [5, 15, 25, 26, 35, 36], 
+# [6, 7, 8, 16, 17, 27, 28, 29, 37, 38, 39, 49, 50, 59, 60, 69, 70], 
+# [9, 10, 18, 19, 20, 30, 40], 
+# [41, 42, 43, 51], 
+# [47, 48, 55, 56, 57, 65, 66, 67, 76, 86], 
+# [52, 61, 62, 63, 71, 72, 73, 74, 75, 81, 82, 83, 84, 85, 91, 92, 93, 94, 95, 96], 
+# [58, 68, 77, 78], 
+# [79, 80, 87, 88, 89, 90, 97, 98, 99, 100]]
+
+# grid_size = 10
+
+# blocks, grid_size = convert_string_to_grid_array('ABBBCDDDEEABBBCDDEEEAABBCCDDD'
+#                                                  'EBBBBCCDDDEFFFBBBGGDDFHBBGGGI'
+#                                                  'DDHHHBGGGIDDHHHHHGIIJJHH'
+#                                                  'HHHGJJJJHHHHHHJJJJ')
 
 # temporary test code, will be moved eventually
-grid, grid_length = convert_string_to_grid_array('AAAAAAABBBAAAACCBBBBDDDACCCCBBDDDECEFCCBDDEEEEFCGGDEEEEEFGGGEEHHEEGGGIEEEHEEEGGIEJJHEEEJGIEJJJJJJJJJ')
-csp = backtrack(grid, grid_length)
-if csp:
-    print('\nSolution found!')
-    print('\nStar positions: {0}'.format(csp.star_values))
-    print('Number of states checked: {0}'.format(total_states))
-    display_grid(grid, grid_length, csp.star_values)
+blocks, grid_size = convert_string_to_grid_array('AAABBBBBBBBDDD'
+                                                 'AAAHHBCBCCCCDD'
+                                                 'HHHHHECCCFFCDD'
+                                                 'HHHEEEEECFCCCD'
+                                                 'HHHGGEEFCFCCDD'
+                                                 'HHHGGGEFFFCFDD'
+                                                 'IHHHGGFFHFFFFD'
+                                                 'IIHHGHHHHJJJFD'
+                                                 'IIHHHHHKHHHJJJ'
+                                                 'INNNHKKKLJJJLJ'
+                                                 'IINNHMMKLJJLLJ'
+                                                 'IINHHHMMLJJJLJ'
+                                                 'IHHHMMMMLLLLLJ'
+                                                 'IIHHHMMMMLLLLL')
+
+start_time = time.time()
+
+csp_assignment = backtrack(blocks, grid_size)
+
+if not csp_assignment:
+    print("\nNo solution found!")
 else:
-    print('no solution found')
+    print("\nSolution Found!")
+    print("\nChecked {} nodes".format(checked_nodes))
+    print("Evaluation took {} seconds".format(time.time() - start_time))
+    display_grid(blocks, grid_size, csp_assignment.values(), False, False)

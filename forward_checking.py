@@ -1,85 +1,81 @@
-from copy import copy, deepcopy
-from GridDisplay import display_grid
-from CSP import Csp
+from csp import Csp
 from Examples.StringToGridArray import convert_string_to_grid_array
-import datetime
+from GridDisplay import display_grid
+import time
 
-total_states = 0
+checked_nodes = 0
 curr_print_threshold = 0
 PRINT_THRESHOLD_INCREMENT = 100000
 
+def forward_check(blocks, grid_size):
+    return recursive_forward_check({}, Csp(blocks, grid_size))
 
-def forward_check(blocks: list, grid_size: int):
-    """
-    Helper method for recursive_backtracking_search
+def recursive_forward_check(assignment, csp):
+    global checked_nodes, curr_print_threshold, PRINT_THRESHOLD_INCREMENT
+    
+    if csp.is_complete(assignment):
+        return assignment
+    
+    var = csp.get_next_unassigned_var()
+    #var = csp.get_most_constrained() #get_next_unassigned_var()
 
-    :param blocks: 2D array representing the blocks of the grid
-    :param grid_size: Size of the grid (10x10 grid -> 10)
-    :return: The csp containing a solution if there is one, None otherwise
-    """
-    global total_states, curr_print_threshold
-    total_states = 0
-    curr_print_threshold = PRINT_THRESHOLD_INCREMENT
-    start = datetime.datetime.now()
-    result = recursive_forward_check(Csp(grid_size, blocks))
-    end = datetime.datetime.now()
-    print('\nEvaluation took: {0}'.format(end - start))
-    return result
-
-
-def recursive_forward_check(csp: Csp):
-    """
-    Implements backtracking search to solve a given Constraint Satisfaction
-    Problem
-
-    :param csp: CSP object
-    :return: The csp containing a solution if there is one, None otherwise
-    """
-    global total_states, curr_print_threshold
-    if csp.complete_csp:
-        return csp
-
-    domains_copy = [x[:] for x in csp.star_domains]
-    domain_min_size_copy = csp.min_domain_size
-    domain_min_num_copy = csp.min_domain_num
-    # curr = csp.next_star_to_assign
-    # curr = csp.min_domain_num  # heuristic 1
-    curr = csp.heuristic_two()
-    for value in csp.star_domains[curr]:
-        total_states += 1
-        if csp.is_valid(value):
-            csp.assign_value(curr, value)
-            csp.propogate_constraints(curr, value)
-            # need to check if there was a domain wipeout
-            if csp.min_domain_size == 0:
-                csp.star_domains = [x[:] for x in domains_copy]
-                csp.unassign_value(curr)
+    #my_copy = {key: set(value) for key, value in csp.domains.items()}
+    for value in csp.domains[var]:
+        checked_nodes += 1
+        if csp.is_consistent(value, assignment):
+            csp.assign_val(var, value, assignment)
+            removed_domains = {}  # for restore in case the assignment fails. using this eliminates unneccessary copy of unchanged domains
+            no_wipeout = csp.propogate_constraints(value, removed_domains)
+            if not no_wipeout:
+                # there was a domain wipeout
+                csp.unassign_val(var, value, assignment)
+                #csp.domains = {key: set(value) for key, value in my_copy.items()}
+                csp.restore_domains(removed_domains)
                 return None
-            result = recursive_forward_check(csp)
+            result = recursive_forward_check(assignment, csp)
             if result:
                 return result
-            csp.star_domains = [x[:] for x in domains_copy]
-            csp.min_domain_size = domain_min_size_copy
-            csp.min_domain_num = domain_min_num_copy
-            csp.unassign_value(curr)
-            
-    if total_states >= curr_print_threshold:
-        print('Checked {0} states so far'.format(total_states))
+            csp.unassign_val(var, value, assignment)
+            csp.restore_domains(removed_domains)
+            #csp.domains = {key: set(value) for key, value in my_copy.items()}
+    
+    if checked_nodes >= curr_print_threshold:
+        print('Checked {0} states so far'.format(checked_nodes))
         curr_print_threshold += PRINT_THRESHOLD_INCREMENT
+    
     return None
 
-
-# temporary test code, will be moved eventually
-grid, grid_length = convert_string_to_grid_array('ABBBCDDDEEABBBCDDEEEAABBCCDDD'
+blocks, grid_size = convert_string_to_grid_array('ABBBCDDDEEABBBCDDEEEAABBCCDDD'
                                                  'EBBBBCCDDDEFFFBBBGGDDFHBBGGGI'
                                                  'DDHHHBGGGIDDHHHHHGIIJJHH'
                                                  'HHHGJJJJHHHHHHJJJJ')
 
-csp = forward_check(grid, grid_length)
-if csp:
-    print('\nSolution found!')
-    print('\nStar positions: {0}'.format(csp.star_values))
-    print('Number of states checked: {0}'.format(total_states))
-    display_grid(grid, grid_length, csp.star_values)
+# temporary test code, will be moved eventually
+# blocks, grid_size = convert_string_to_grid_array('AAABBBBBBBBDDD'
+#                                                  'AAAHHBCBCCCCDD'
+#                                                  'HHHHHECCCFFCDD'
+#                                                  'HHHEEEEECFCCCD'
+#                                                  'HHHGGEEFCFCCDD'
+#                                                  'HHHGGGEFFFCFDD'
+#                                                  'IHHHGGFFHFFFFD'
+#                                                  'IIHHGHHHHJJJFD'
+#                                                  'IIHHHHHKHHHJJJ'
+#                                                  'INNNHKKKLJJJLJ'
+#                                                  'IINNHMMKLJJLLJ'
+#                                                  'IINHHHMMLJJJLJ'
+#                                                  'IHHHMMMMLLLLLJ'
+#                                                  'IIHHHMMMMLLLLL')
+
+start_time = time.time()
+
+csp_assignment = forward_check(blocks, grid_size)
+
+if not csp_assignment:
+    print("\nNo solution found!")
+    print("\nChecked {} nodes".format(checked_nodes))
+    print("Evaluation took {} seconds".format(time.time() - start_time))
 else:
-    print('no solution found')
+    print("\nSolution Found!")
+    print("\nChecked {} nodes".format(checked_nodes))
+    print("Evaluation took {} seconds".format(time.time() - start_time))
+    display_grid(blocks, grid_size, csp_assignment.values(), False, False)

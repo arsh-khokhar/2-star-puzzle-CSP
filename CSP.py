@@ -1,278 +1,164 @@
-import random
-
-
 class Csp:
-    """
-    An csp of stars to spaces on a grid
-
-    Attributes
-        grid_size           Size of the grid (10x10 grid -> 10)
-        blocks              2D array representing the blocks of the grid
-        star_values         Current csp of grid positions to stars,
-                            index 0,1 are for row 1, 2,3 for row 2,etc.
-        complete_csp        True when every star has a value, False otherwise
-        next_star_to_assign Next star to assign (without heuristic)
-        min_domain_num      Of current unassigned stars, what is the smallest domain
-        min_domain_size     Size of the min_domain_num domain
-    """
-
-    def __init__(self, grid_size: int, blocks: list):
+    def __init__(self, blocks, grid_size):
+        self.num_stars = 2*grid_size # for the 2 star problem
         self.grid_size = grid_size
         self.blocks = blocks
-        
-        # dictionary to map each cell to a block
-        # This would significantly reduce the block lookups later
-        self.cell_block_map = {}
-        for block_index, block in enumerate(blocks):
+        self.cell_map = {}
+
+        for i, block in enumerate(blocks):
             for cell in block:
-                self.cell_block_map[cell] = block_index
+                self.cell_map[cell] = {'block': i, 'in_domains_of': [2*i, 2*i + 1]}
 
-        self.star_values = []  # star 0,1 are in row 1, 2,3 in row 2 etc,
+        self.unassigned_vars = []
+        for i in range(self.num_stars):
+            self.unassigned_vars.append(i)
+
+        self.next_var_to_assign = 0
         
-        for i in range(grid_size * 2):
-            self.star_values.append(-1)
+        self.domains = {}
+        num_domains = 0
+        for block in blocks:
+            self.domains[num_domains] = set(block[:])
+            self.domains[num_domains + 1] = set(block[:])
+            num_domains += 2
 
-        self.star_domains = []
-        # initialize domains for each star as its row
-        for i in range(len(self.star_values)):
-            self.star_domains.insert(i, list(
-            range((int(i/2)) * self.grid_size + 1,
-            (int(i/2) + 1) * self.grid_size + 1)))
-        
-        self.unassigned_stars = list(range(grid_size*2)) # indices of unassigned stars for forward-check. Initially all stars are unassigned
+        self.block_occupancy = [0]*len(blocks)
+        self.row_occupancy = [0]*grid_size
+        self.col_occupancy = [0]*grid_size
 
-        self.block_occupancy = [0]*len(blocks)  # block occupancy, ranging from 0 to 2. If 2, then block is fully occupied
-        self.column_occupancy = [0]*grid_size  # column occupancy, ranging from 0 to 2. If 2, the column is fully occupied
+        self.crossed_off = {}
 
-        self.complete_csp = False
-        self.next_star_to_assign = 0
+    def same_row(self, value1, value2):
+        return (value1 - 1) // self.grid_size == (value2 - 1) // self.grid_size
 
-        self.min_domain_num = 0
-        self.min_domain_size = grid_size
+    def same_col(self, value1, value2):
+        return value1 % self.grid_size == value2 % self.grid_size
+    
+    def same_block(self, value1, value2):
+        return self.cell_map[value1]['block'] == self.cell_map[value2]['block']
+    
+    def is_col_occupied(self, value):
+        return self.col_occupancy[value % self.grid_size] >= 2
+    
+    def is_row_occupied(self, value):
+        return self.row_occupancy[(value - 1)// self.grid_size] >= 2 
 
-    def assign_value(self, star_num: int, value: int):
-        """
-        Set star_values[star_num] to value, update other variables
-
-        :param star_num: Star to be assigned value
-        :param value: value to assign
-        """
-        if self.star_values[star_num] == -1:
-            self.column_occupancy[value % self.grid_size] += 1
-            self.block_occupancy[self.cell_block_map[value]] += 1 
-            self.star_values[star_num] = value
-            self.next_star_to_assign = star_num + 1
-            self.safe_remove(self.unassigned_stars, star_num)
-        else:
-            print('Attempting to assign a cell that is already assigned')
-
-        if len(self.unassigned_stars) == 0:
-            self.complete_csp = True
-
-    def unassign_value(self, star_num: int):
-        """
-        Set star_values[star_num] to -1, update other variables
-
-        :param star_num: Star to be assigned value
-        """
-        if self.star_values[star_num] != -1:
-            value = self.star_values[star_num]
-            self.block_occupancy[self.cell_block_map[value]] -= 1
-            self.column_occupancy[value % self.grid_size] -= 1
-            self.star_values[star_num] = -1
-            self.next_star_to_assign = star_num
-            self.unassigned_stars.append(star_num)
-        else:
-            print('Attempting to unassign a cell that is already unassigned')
-
-    def propogate_constraints(self, star_num: int, value: int):
-        """
-        Propogate constraints based on the currently assigned star
-
-        :param star_num: index of the star just assigned that will affect other stars' domains
-        :return: False if domain wipeout (dead end) is detected, false otherwise
-        """
-        domain_size_dict = {}
-        for star in self.unassigned_stars:
-            if star == star_num:
-                continue
-            domain = self.star_domains[star]
-            for cell in domain[:]:
-
-                # since value is now occupied, it needs to get deleted from the domains of
-                # remaining stars 
-                if cell == value:
-                    self.safe_remove(domain, cell)
-
-                # remaining stars cannot be adjacent to value, so update domains accordingly
-                if self.are_adjacent(cell, value):
-                    self.safe_remove(domain, cell)
-
-                # column occupancy constraint
-                # check if the column is filled after putting value 
-                # and update the remaining domains accordingly
-                if self.column_occupancy[value % self.grid_size] >= 2 and \
-                        self.same_col(cell, value):
-                    self.safe_remove(domain, cell)
-
-                # block occupancy constraint
-                # cell_block_map[value] gives the index of block the value is in,
-                # and the occupancy for the block at this index is checked
-                if self.block_occupancy[self.cell_block_map[value]] >= 2 and \
-                        self.same_block(cell, value):
-                    self.safe_remove(domain, cell)
-
-            domain_size_dict[star] = len(domain)
-
-        if len(self.unassigned_stars) > 0:
-            min_value = min(domain_size_dict.values())
-            keys = [key for key, value in domain_size_dict.items() if value == min_value]
-            chosen_min = random.choice(keys)
-
-            self.min_domain_size = domain_size_dict[chosen_min]
-            self.min_domain_num = chosen_min
-
-    def same_row(self, star1: int, star2: int):
-        """
-        Check to see if two stars are in the same row
-
-        :param star1: First star to be compared
-        :param star2: Second star to be compared
-        :return: True if the stars are in the same row, False otherwise
-        """
-        return int((star1 - 1) / self.grid_size) == int((star2 - 1) / self.grid_size)
-
-    def same_col(self, star1: int, star2: int):
-        """
-        Check to see if two stars are in the same column
-
-        :param star1: First star to be compared
-        :param star2: Second star to be compared
-        :return: True if the stars are in the same column, False otherwise
-        """
-        return star1 % self.grid_size == star2 % self.grid_size
-
-    def same_block(self, star1: int, star2: int):
-        """
-        Check to see if two stars are in the same block
-
-        :param star1: First star to be compared
-        :param star2: Second star to be compared
-        :return: True if the stars are in the same block, False otherwise
-        """
-        return self.cell_block_map[star1] == self.cell_block_map[star2]
-
-    def are_adjacent(self, star1: int, star2: int):
-        """
-        Check to see if two stars are adjacent to each other.
-
-        :param star1: First star to be compared
-        :param star2: Second star to be compared
-        :return: True if the stars are adjacent, False otherwise
-        """
-        # return statements can be removed heavily, but kept this
-        #   for now for better readability
-        if star1 == star2:  # same cell
-            return True
-        if star1 == star2 - self.grid_size:  # star2 on top
-            return True
-        if star1 == star2 + self.grid_size:  # star2 on bottom
+    def is_block_occupied(self, value):
+        block = self.cell_map[value]['block'] 
+        return self.block_occupancy[block] >= 2
+    
+    def are_adjacent(self, value1: int, value2: int):
+        if value1 == value2 or \
+            value1 == value2 - self.grid_size or \
+            value1 == value2 + self.grid_size:
             return True
 
-        # check that star1 is not on right edge
-        if star1 % self.grid_size != 0:
+        # check that value1 is not on right edge
+        if value1 % self.grid_size != 0:
             # can safely detect the right neighbors here
-            if star1 == star2 - 1:  # star2 on right
+            if value1 == value2 - 1 or \
+                value1 == value2 - self.grid_size - 1 or \
+                 value1 == value2 + self.grid_size - 1:
                 return True
-            if star1 == star2 - self.grid_size - 1:  # star2 on top-right
-                return True
-            if star1 == star2 + self.grid_size - 1:  # star2 on bottom-right
-                return True
-
-        # check that star1 is not on left edge
-        if star1 % self.grid_size != 1:
+        
+        # check that value1 is not on left edge
+        if value1 % self.grid_size != 1:
             # can safely detect the left neighbors here
-            if star1 == star2 + 1:  # star2 on left
-                return True
-            if star1 == star2 - self.grid_size + 1:  # star2 on top-left
-                return True
-            if star1 == star2 + self.grid_size + 1:  # star2 on bottom-left
+            if value1 == value2 + 1 or \
+                value1 == value2 - self.grid_size + 1 or \
+                value1 == value2 + self.grid_size + 1:
                 return True
 
         return False
 
-    def is_valid(self, grid_index: int):
-        """
-        Check to see if grid_index being the next star location will be valid.
-        Note that we only check constraints that would change because of
-        the insertion, not the entire csp.
+    def is_consistent(self, value, assignment):
+        if self.is_col_occupied(value) or self.is_row_occupied(value) or self.is_block_occupied(value):
+            return False
+        
+        for val in assignment.values():
+            if self.are_adjacent(value, val):
+                return False
 
-        :param grid_index: The grid location of the next star.
-        :return: True if valid and False if invalid.
-        """
-        num_in_row = 0
-        num_in_col = 0
-        num_in_block = 0
-
-        for star in self.star_values:
-            if star != -1:
-                if self.same_row(star, grid_index):
-                    num_in_row += 1
-                if self.same_col(star, grid_index):
-                    num_in_col += 1
-                if self.same_block(star, grid_index):
-                    num_in_block += 1
-                if self.are_adjacent(star, grid_index):
-                    return False
-                if num_in_row >= 2 \
-                        or num_in_col >= 2 \
-                        or num_in_block >= 2:
-                    return False
         return True
+    
+    def is_complete(self, assignment):
+        return len(assignment) == 2*self.grid_size
 
-    def heuristic_two(self):
-        domain_size_diff_dict = {}
+    def get_next_unassigned_var(self):
+        return self.unassigned_vars[0] # self.next_var_to_assign
+    
+    def get_most_constrained(self):
+        most_constrained = self.unassigned_vars[0]
+        smallest_domain = self.domains[most_constrained]
+        for var in self.unassigned_vars:
+            if len(smallest_domain) > len(self.domains[var]):
+                smallest_domain = self.domains[var]
+                most_constrained = var
+        return most_constrained
 
-        original_domain_sizes_sum = self.sum_of_domain_sizes()
-        domain_min_size_copy = self.min_domain_size
-        domain_min_num_copy = self.min_domain_num
-        for star in self.unassigned_stars:
-            domain = self.star_domains[star]
-            curr_domain_sizes_reduction = 0
-            for cell in domain:
-                domains_copy = [x[:] for x in self.star_domains]
-                self.propogate_constraints(star, cell)
-                curr_domain_sizes_reduction += original_domain_sizes_sum \
-                                               - self.sum_of_domain_sizes()
-                self.star_domains = [x[:] for x in domains_copy]
-            domain_size_diff_dict[star] = curr_domain_sizes_reduction
+    def assign_val(self, var, value, assignment):
+        assignment[var] = value
+        self.next_var_to_assign = var + 1
+        self.row_occupancy[(value - 1) // self.grid_size] += 1
+        self.col_occupancy[value % self.grid_size] += 1
+        block = self.cell_map[value]['block']
+        self.block_occupancy[block] += 1
+        self.safe_remove_list(self.unassigned_vars, var)
 
-        self.min_domain_size = domain_min_size_copy
-        self.min_domain_num = domain_min_num_copy
+    def unassign_val(self, var, value, assignment):
+        del assignment[var]
+        self.next_var_to_assign -= 1
+        self.row_occupancy[(value - 1) // self.grid_size] -= 1
+        self.col_occupancy[value % self.grid_size] -= 1
+        block = self.cell_map[value]['block']
+        self.block_occupancy[block] -= 1 
+        self.unassigned_vars.append(var)
 
-        if len(self.unassigned_stars) > 0:
-            max_value = max(domain_size_diff_dict.values())
-            keys = [key for key, value in domain_size_diff_dict.items() if value == max_value]
-            chosen_max = random.choice(keys)
+    def propogate_constraints(self, value, removed_domains):
+        is_row_occupied = self.is_row_occupied(value)
+        is_col_occupied = self.is_col_occupied(value)
+        is_block_occupied = self.is_block_occupied(value)
+        for var in self.unassigned_vars:
+            domain = self.domains[var]
+            domain_copy = list(domain) 
+            is_removed = False
+            for cell in domain_copy:
+                if (self.same_row(cell, value) and is_row_occupied) or \
+                    (self.same_col(cell, value) and is_col_occupied) or \
+                    (self.same_block(cell, value) and is_block_occupied) or\
+                    self.are_adjacent(value, cell):
+                    is_removed = True
+                    self.safe_remove_set(domain, cell)
+                if len(domain) == 0:
+                    # domain wipeout
+                    if is_removed:
+                        removed_domains[var] = domain_copy
+                    return False
+            if is_removed:
+                removed_domains[var] = domain_copy
+        return True
+    
+    def restore_domains(self, removed_domains):
+        for key in removed_domains:
+            self.domains[key] = set(removed_domains[key])
 
-            return chosen_max
-
-    def sum_of_domain_sizes(self):
-        domain_sizes_sum = 0
-        for star in self.unassigned_stars:
-            domain_sizes_sum += len(self.star_domains[star])
-        return domain_sizes_sum
-
-    def safe_remove(self, input_list: list, to_remove: int):
-        """
-        Attempt removing an element from a list without throwing any exceptions
-        if the element was not found
-
-        :param input_list: list from which the element has to be removed
-        :param to_remove: element to be removed
-        """
+    def safe_remove_list(self, input_list, value):
         try:
-            input_list.remove(to_remove)
+            input_list.remove(value)
         except ValueError:
-            # if we try to remove an element not in the list, don't do anything
+            print("trying to remove something funky from a list")
+            pass
+    
+    def safe_remove_set(self, input_set, value):
+        try:
+            input_set.remove(value)
+        except KeyError:
+            print("trying to remove something funky from a set")
+            pass
+
+    def safe_remove_dict(self, input_dict, value):
+        try:
+            del input_dict[value]
+        except KeyError:
+            print("trying to remove something funky from a dictionary")
             pass
