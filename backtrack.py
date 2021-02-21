@@ -4,17 +4,20 @@ from GridDisplay import display_grid
 import time
 
 checked_nodes = 0
+curr_print_threshold = 0
+PRINT_THRESHOLD_INCREMENT = 100000
 
-def backtrack(blocks, grid_size):
-    return recursive_backtrack({}, Csp(blocks, grid_size))
+def backtrack(blocks, grid_size, heuristic):
+    return recursive_backtrack({}, Csp(blocks, grid_size, heuristic))
 
 def recursive_backtrack(assignment, csp):
-    global checked_nodes
+    global checked_nodes, curr_print_threshold, PRINT_THRESHOLD_INCREMENT
     
     if csp.is_complete(assignment):
         return assignment
-    
+
     var = csp.get_next_unassigned_var()
+    
     for value in csp.domains[var]:
         checked_nodes += 1
         if csp.is_consistent(value, assignment):
@@ -23,6 +26,10 @@ def recursive_backtrack(assignment, csp):
             if result:
                 return result
             csp.unassign_val(var, value, assignment) # deleting from the assignment
+    
+    if checked_nodes >= curr_print_threshold:
+        print('Checked {0} states so far'.format(checked_nodes))
+        curr_print_threshold += PRINT_THRESHOLD_INCREMENT
     return None
 
 # blocks = [[1, 11, 21, 22], 
@@ -61,12 +68,18 @@ blocks, grid_size = convert_string_to_grid_array('AAABBBBBBBBDDD'
 
 start_time = time.time()
 
-csp_assignment = backtrack(blocks, grid_size)
+# heuristic will come from args or something similar
+heuristic = 1
 
+csp_assignment = backtrack(blocks, grid_size, heuristic)
+
+end_time = time.time() - start_time
 if not csp_assignment:
     print("\nNo solution found!")
+    print("\nChecked {} nodes".format(checked_nodes))
+    print("Evaluation took {} seconds ({} minutes {} seconds)".format(end_time, int(end_time // 60), end_time % 60))
 else:
     print("\nSolution Found!")
     print("\nChecked {} nodes".format(checked_nodes))
-    print("Evaluation took {} seconds".format(time.time() - start_time))
+    print("Evaluation took {} seconds ({} minutes {} seconds)".format(end_time, int(end_time // 60), end_time % 60))
     display_grid(blocks, grid_size, csp_assignment.values(), False, False)

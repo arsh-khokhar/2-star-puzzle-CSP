@@ -1,10 +1,12 @@
 class Csp:
-    def __init__(self, blocks, grid_size):
+    def __init__(self, blocks, grid_size, ordering_choice):
         self.num_stars = 2*grid_size # for the 2 star problem
         self.grid_size = grid_size
         self.blocks = blocks
         self.cell_map = {}
 
+        self.ordering_choice = ordering_choice
+        
         for i, block in enumerate(blocks):
             for cell in block:
                 self.cell_map[cell] = {'block': i, 'in_domains_of': [2*i, 2*i + 1]}
@@ -85,7 +87,10 @@ class Csp:
         return len(assignment) == 2*self.grid_size
 
     def get_next_unassigned_var(self):
-        return self.unassigned_vars[0] # self.next_var_to_assign
+        if self.ordering_choice == 0:
+            return self.unassigned_vars[0]
+        if self.ordering_choice == 1:
+            return self.get_most_constrained()
     
     def get_most_constrained(self):
         most_constrained = self.unassigned_vars[0]
