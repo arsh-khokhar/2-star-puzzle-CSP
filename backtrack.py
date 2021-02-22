@@ -8,7 +8,7 @@
     2-star constraint satisfaction problem. The algorithm can be
     called externally by calling the function backtrack, which takes
     the grid as a 2d array of blocks, the size of the grid, and the
-    heuristic to be used.
+    heuristic to be used as arguments.
 """
 
 import time
@@ -23,7 +23,8 @@ curr_print_threshold = PRINT_THRESHOLD_INCREMENT
 
 def backtrack(blocks: list, grid_size: int, heuristic: int):
     """
-    Constructs a new csp object and calls the recursive function that solves the problem
+    Constructs a new csp object and calls the recursive backtracking algorithm
+    to solve the problem
 
     :param blocks: 2-D array containing the blocks, and their contents.
     :param grid_size: Size of the grid (10x10 grid -> 10)
@@ -35,7 +36,7 @@ def backtrack(blocks: list, grid_size: int, heuristic: int):
 
 def recursive_backtrack(assignment: set, csp: object):
     """
-    Recursively attempts to solve the 2-star csp
+    Recursively attempts to solve the 2-star csp using backtracking
     :param assignment: Current assignment for the 2-star csp
     :param csp: 2-star csp object for the current recursion level
     :return assignment: A valid solution of the 2-star csp, if no solution, then return None
@@ -52,9 +53,9 @@ def recursive_backtrack(assignment: set, csp: object):
         checked_nodes += 1
         if csp.is_consistent(value, assignment):
             csp.assign_val(var, value, assignment) # adding to the assignment, updating other variables as required
-            result = recursive_backtrack(assignment, csp)
+            result = recursive_backtrack(assignment, csp)   # continue to next recusrion level
             if result:
-                return result
+                return result   # found a valid assignment
             csp.unassign_val(var, value, assignment) # deleting from the assignment
         # If the time taken is more than 10 mins, return no solution
         if (time.time() - csp.start_time) / 60 >= 10:
