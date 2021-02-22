@@ -11,7 +11,7 @@ from forward_checking import forward_check
 #  backtrack.py and forward_checking.py, given the assignment description
 def main():
     if len(sys.argv) < 4:
-        print('Usage: python main.py [fc or bc] [grid file] [heuristic type (0,1,2,or 3)]')
+        print('Usage: python main.py [fc or bt] [grid file] [heuristic type (0,1,2,or 3)]')
         return -1
         # TODO: we might not specify the grid file, just read all 3 and output all solutions
         #  I've added code to do this, but feel free to remove it

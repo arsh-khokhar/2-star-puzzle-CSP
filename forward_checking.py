@@ -19,8 +19,6 @@ def recursive_forward_check(assignment, csp):
         return assignment, checked_nodes
     
     var = csp.get_next_unassigned_var()
-
-    #my_copy = {key: set(value) for key, value in csp.domains.items()}
     for value in csp.domains[var]:
         checked_nodes += 1
         if csp.is_consistent(value, assignment):
@@ -30,7 +28,6 @@ def recursive_forward_check(assignment, csp):
             if not no_wipeout:
                 # there was a domain wipeout
                 csp.unassign_val(var, value, assignment)
-                #csp.domains = {key: set(value) for key, value in my_copy.items()}
                 csp.restore_domains(removed_domains)
                 continue
             result = recursive_forward_check(assignment, csp)
@@ -38,7 +35,6 @@ def recursive_forward_check(assignment, csp):
                 return result
             csp.unassign_val(var, value, assignment)
             csp.restore_domains(removed_domains)
-            #csp.domains = {key: set(value) for key, value in my_copy.items()}
         if (time.time() - csp.start_time) / 60 >= 10:
             return None, checked_nodes
     

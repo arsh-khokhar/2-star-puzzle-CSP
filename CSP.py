@@ -22,8 +22,6 @@ class Csp:
         for i in range(self.num_stars):
             self.unassigned_vars.append(i)
 
-        self.next_var_to_assign = 0
-
         self.domains = {}
         num_domains = 0
         for block in blocks:
@@ -34,8 +32,6 @@ class Csp:
         self.block_occupancy = [0]*len(blocks)
         self.row_occupancy = [0]*grid_size
         self.col_occupancy = [0]*grid_size
-
-        self.crossed_off = {}
 
         self.num_cells_block_constrains \
             = self.calculate_num_cells_block_constrains()
@@ -109,20 +105,16 @@ class Csp:
                                   self.get_most_constrained()])
 
     def get_most_constrained(self):
-        constraint_list = {}
+        most_constrained = self.unassigned_vars[0]
+        smallest_domain = self.domains[most_constrained]
         for var in self.unassigned_vars:
-            constraint_list[var] = self.domains[var]
-
-        if len(constraint_list) > 0:
-            max_value = max(constraint_list.values())
-            keys = [key for key, value in constraint_list.items() if value == max_value]
-            chosen_max = random.choice(keys)
-
-            return chosen_max
+            if len(smallest_domain) > len(self.domains[var]):
+                smallest_domain = self.domains[var]
+                most_constrained = var
+        return most_constrained
 
     def assign_val(self, var, value, assignment):
         assignment[var] = value
-        self.next_var_to_assign = var + 1
         self.row_occupancy[(value - 1) // self.grid_size] += 1
         self.col_occupancy[value % self.grid_size] += 1
         block = self.cell_map[value]['block']
@@ -130,8 +122,7 @@ class Csp:
         self.safe_remove_list(self.unassigned_vars, var)
 
     def unassign_val(self, var, value, assignment):
-        del assignment[var]
-        self.next_var_to_assign -= 1
+        self.safe_remove_dict(assignment, var)
         self.row_occupancy[(value - 1) // self.grid_size] -= 1
         self.col_occupancy[value % self.grid_size] -= 1
         block = self.cell_map[value]['block']
