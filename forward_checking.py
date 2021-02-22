@@ -40,7 +40,7 @@ def recursive_forward_check(assignment, csp):
             csp.restore_domains(removed_domains)
             #csp.domains = {key: set(value) for key, value in my_copy.items()}
         if (time.time() - csp.start_time) / 60 >= 10:
-            return None
+            return None, checked_nodes
     
     if checked_nodes >= curr_print_threshold:
         print('Checked {0} states so far'.format(checked_nodes))

@@ -22,17 +22,22 @@ def main():
 
     # test grid stuff goes here
 
+    solution = None
     csp_assignment = {}
-    start_time = time.time()
     checked_nodes = 0
+
+    start_time = time.time()
     if sys.argv[2].lower() == 'bt':
-        csp_assignment, checked_nodes = backtrack(blocks, grid_size, int(sys.argv[3]))
+        solution = backtrack(blocks, grid_size, int(sys.argv[3]))
         # csp_assignment2, checked_nodes2 = backtrack(blocks2, grid_size2, int(sys.argv[3]))
         # csp_assignment3, checked_nodes3 = backtrack(blocks3, grid_size3, int(sys.argv[3]))
     elif sys.argv[2].lower() == 'fc':
-        csp_assignment, checked_nodes = forward_check(blocks, grid_size, int(sys.argv[3]))
+        solution = forward_check(blocks, grid_size, int(sys.argv[3]))
         # csp_assignment2, checked_nodes2 = forward_check(blocks2, grid_size2, int(sys.argv[3]))
         # csp_assignment3, checked_nodes3 = forward_check(blocks3, grid_size3, int(sys.argv[3]))
+
+    if solution:
+        csp_assignment, checked_nodes = solution
 
     end_time = time.time() - start_time
     if not csp_assignment:

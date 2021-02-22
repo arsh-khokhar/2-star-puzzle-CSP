@@ -24,18 +24,12 @@ def recursive_backtrack(assignment, csp):
         checked_nodes += 1
         if csp.is_consistent(value, assignment):
             csp.assign_val(var, value, assignment) #assignment[var] = value
-            removed_domains = None
-            if csp.ordering_choice > 0:
-                removed_domains = {}
-                csp.propogate_constraints(value, removed_domains)
             result = recursive_backtrack(assignment, csp)
             if result:
                 return result
             csp.unassign_val(var, value, assignment) # deleting from the assignment
-            if csp.ordering_choice > 0:
-                csp.restore_domains(removed_domains)
         if (time.time() - csp.start_time) / 60 >= 10:
-            return None
+            return None, checked_nodes
     
     if checked_nodes >= curr_print_threshold:
         print('Checked {0} states so far'.format(checked_nodes))

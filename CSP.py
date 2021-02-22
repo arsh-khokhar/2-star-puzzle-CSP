@@ -109,15 +109,16 @@ class Csp:
                                   self.get_most_constrained()])
 
     def get_most_constrained(self):
-        most_constrained = self.unassigned_vars[0]
-        smallest_domain = self.domains[most_constrained]
+        constraint_list = {}
         for var in self.unassigned_vars:
-            if len(smallest_domain) > len(self.domains[var]):
-                smallest_domain = self.domains[var]
-                most_constrained = var
-        return most_constrained
-    
-    #def get_most_constraining(self):
+            constraint_list[var] = self.domains[var]
+
+        if len(constraint_list) > 0:
+            max_value = max(constraint_list.values())
+            keys = [key for key, value in constraint_list.items() if value == max_value]
+            chosen_max = random.choice(keys)
+
+            return chosen_max
 
     def assign_val(self, var, value, assignment):
         assignment[var] = value
