@@ -116,6 +116,8 @@ class Csp:
                 smallest_domain = self.domains[var]
                 most_constrained = var
         return most_constrained
+    
+    #def get_most_constraining(self):
 
     def assign_val(self, var, value, assignment):
         assignment[var] = value
