@@ -1,7 +1,9 @@
-from csp import Csp
+from CSP import Csp
 from Examples.StringToGridArray import convert_string_to_grid_array
 from GridDisplay import display_grid
 import time
+from main import load_grid_file
+import functools
 
 checked_nodes = 0
 curr_print_threshold = 0
@@ -30,13 +32,15 @@ def recursive_forward_check(assignment, csp):
                 csp.unassign_val(var, value, assignment)
                 #csp.domains = {key: set(value) for key, value in my_copy.items()}
                 csp.restore_domains(removed_domains)
-                return None
+                continue
             result = recursive_forward_check(assignment, csp)
             if result:
                 return result
             csp.unassign_val(var, value, assignment)
             csp.restore_domains(removed_domains)
             #csp.domains = {key: set(value) for key, value in my_copy.items()}
+        if (time.time() - csp.start_time) / 60 >= 10:
+            return None
     
     if checked_nodes >= curr_print_threshold:
         print('Checked {0} states so far'.format(checked_nodes))
@@ -44,10 +48,7 @@ def recursive_forward_check(assignment, csp):
     
     return None
 
-blocks, grid_size = convert_string_to_grid_array('ABBBCDDDEEABBBCDDEEEAABBCCDDD'
-                                                 'EBBBBCCDDDEFFFBBBGGDDFHBBGGGI'
-                                                 'DDHHHBGGGIDDHHHHHGIIJJHH'
-                                                 'HHHGJJJJHHHHHHJJJJ')
+# blocks, grid_size = convert_string_to_grid_array('AAAAAAABBBAAAACCBBBBDDDACCCCBBDDDECEFCCBDDEEEEFCGGDEEEEEFGGGEEHHEEGGGIEEEHEEEGGIEJJHEEEJGIEJJJJJJJJJ')
 
 # temporary test code, will be moved eventually
 blocks, grid_size = convert_string_to_grid_array('AAABBBBBBBBDDD'
@@ -67,8 +68,12 @@ blocks, grid_size = convert_string_to_grid_array('AAABBBBBBBBDDD'
 
 start_time = time.time()
 
+# blocks, grid_size = load_grid_file('grid8x8.txt')
+
 # heuristic will come from args or something similar
-heuristic = 1
+heuristic = 2
+
+csp = Csp(blocks, grid_size, heuristic)
 
 csp_assignment = forward_check(blocks, grid_size, heuristic)
 
@@ -77,6 +82,7 @@ if not csp_assignment:
     print("\nNo solution found!")
     print("\nChecked {} nodes".format(checked_nodes))
     print("Evaluation took {} seconds ({} minutes {} seconds)".format(end_time, int(end_time // 60), end_time % 60))
+    display_grid(blocks, grid_size, [], False, False)
 else:
     print("\nSolution Found!")
     print("\nChecked {} nodes".format(checked_nodes))

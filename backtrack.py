@@ -1,4 +1,4 @@
-from csp import Csp
+from CSP import Csp
 from Examples.StringToGridArray import convert_string_to_grid_array
 from GridDisplay import display_grid
 import time
@@ -22,10 +22,18 @@ def recursive_backtrack(assignment, csp):
         checked_nodes += 1
         if csp.is_consistent(value, assignment):
             csp.assign_val(var, value, assignment) #assignment[var] = value
+            removed_domains = None
+            if csp.ordering_choice > 0:
+                removed_domains = {}
+                csp.propogate_constraints(value, removed_domains)
             result = recursive_backtrack(assignment, csp)
             if result:
                 return result
             csp.unassign_val(var, value, assignment) # deleting from the assignment
+            if csp.ordering_choice > 0:
+                csp.restore_domains(removed_domains)
+        if (time.time() - csp.start_time) / 60 >= 10:
+            return None
     
     if checked_nodes >= curr_print_threshold:
         print('Checked {0} states so far'.format(checked_nodes))
@@ -69,7 +77,7 @@ blocks, grid_size = convert_string_to_grid_array('AAABBBBBBBBDDD'
 start_time = time.time()
 
 # heuristic will come from args or something similar
-heuristic = 1
+heuristic = 2
 
 csp_assignment = backtrack(blocks, grid_size, heuristic)
 
