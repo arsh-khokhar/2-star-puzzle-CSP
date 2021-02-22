@@ -1,34 +1,60 @@
-from GridDisplay import display_grid
+import sys
+import time
+
+from backtrack import backtrack
+from grid_display import display_grid
+from grid_file_loader import load_grid_file
+from forward_checking import forward_check
 
 
-def load_grid_file(name):
-    """
-    Reads grid file and loads data into a 2D array.
+# TODO: unsure if we should have a main file or copy this code into both
+#  backtrack.py and forward_checking.py, given the assignment description
+def main():
+    if len(sys.argv) < 4:
+        print('Usage: python main.py [fc or bc] [grid file] [heuristic type (0,1,2,or 3)]')
+        return -1
+        # TODO: we might not specify the grid file, just read all 3 and output all solutions
+        #  I've added code to do this, but feel free to remove it
 
-    TODO: This is very basic, we'll likely need verification or to keep track
-    of other things as we progress
+    blocks, grid_size = load_grid_file(sys.argv[1])
+    # blocks2, grid_size2 = load_grid_file('grid10x10.txt')
+    # blocks3, grid_size3 = load_grid_file('grid14x14.txt')
 
-    :param name: The name of the grid file to be loaded.
-    :return: 2D array of blocks
-    """
+    # test grid stuff goes here
 
-    blocks = []
-    with open(name, 'r') as file:
-        lines = file.readlines()
-        for line in lines:
-            cells = line.strip().split('\t')[1].split(',')
-            # convert strings to ints
-            blocks.append([int(numeric_string) for numeric_string in cells])
+    csp_assignment = {}
+    start_time = time.time()
+    checked_nodes = 0
+    if sys.argv[2].lower() == 'bt':
+        csp_assignment, checked_nodes = backtrack(blocks, grid_size, int(sys.argv[3]))
+        # csp_assignment2, checked_nodes2 = backtrack(blocks2, grid_size2, int(sys.argv[3]))
+        # csp_assignment3, checked_nodes3 = backtrack(blocks3, grid_size3, int(sys.argv[3]))
+    elif sys.argv[2].lower() == 'fc':
+        csp_assignment, checked_nodes = forward_check(blocks, grid_size, int(sys.argv[3]))
+        # csp_assignment2, checked_nodes2 = forward_check(blocks2, grid_size2, int(sys.argv[3]))
+        # csp_assignment3, checked_nodes3 = forward_check(blocks3, grid_size3, int(sys.argv[3]))
 
-    # The below retrival assumes the format "gridNxN.txt". Need to add error handling later
-    grid_size = name.split('grid')[-1].split('.')[0].split('x') # retrive size of the grid from the filename
-    assert(grid_size[0] == grid_size[-1]) # we only support square grids, so this check is required
-    
-    return blocks, int(grid_size[0])
+    end_time = time.time() - start_time
+    if not csp_assignment:
+        print("\nNo solution found!")
+        print("\nChecked {} nodes".format(checked_nodes))
+        # TODO: technically, we don't need to print time taken in the handin version,
+        #  but we still need it for the report
+        print("Evaluation took {} seconds ({} minutes {} seconds)".format(end_time, int(end_time // 60),
+                                                                          end_time % 60))
+        # TODO: do we need to print the grid if there's no solution?
+        display_grid(blocks, grid_size, [])
+    else:
+        print("\nSolution Found!")
+        print("\nChecked {} nodes".format(checked_nodes))
+        # print("\nChecked {} nodes for 10x10".format(checked_nodes))
+        # print("\nChecked {} nodes for 14x14".format(checked_nodes))
+        print("Evaluation took {} seconds ({} minutes {} seconds)".format(end_time, int(end_time // 60),
+                                                                          end_time % 60))
+        display_grid(blocks, grid_size, csp_assignment.values())
+        # display_grid(blocks2, grid_size2, csp_assignment2.values(), blocking=False, title='Solution 10x10')
+        # display_grid(blocks3, grid_size3, csp_assignment3.values(), title='Solution 14x14')
 
 
 if __name__ == '__main__':
-    grid, grid_length = load_grid_file('grid8x8.txt')
-    display_grid(grid, grid_length, [1,2,9,10,20,21,28,29,38,39,46,47,49,50,57,58],
-                 show_block_ids=True, show_ids=True)
-
+    main()

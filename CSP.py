@@ -1,5 +1,5 @@
-import random
 import functools
+import random
 import time
 
 
@@ -177,7 +177,16 @@ class Csp:
         return sorted(num_cells_block_constrains.items(),
                       key=functools.cmp_to_key(self.compare_with_ties))
 
+    # TODO: So apparently I was sorting the wrong way (low-high vs high-low)
+    #    and h2 is just as bad as before (80 000 000+ states) this kinda makes
+    #    sense since we favour larger blocks, which have larger domains at higher
+    #    levels, which isn't good (we move slower through domains at higher levels,
+    #    hence the search takes longer).
+    #  We could do an average cells affected per cell in a block to mitigate this,
+    #    but I'm not sure that's correct.
+    #  With that said, the code does work how planned it to.
     def get_most_constraining(self):
+        # num_cells_block_constrains is already sorted by value, high to low
         for block_num, value \
                 in self.num_cells_block_constrains:
             if block_num*2 in self.unassigned_vars:
