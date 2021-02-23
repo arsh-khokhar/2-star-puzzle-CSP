@@ -24,27 +24,31 @@ class Csp:
         unassigned_vars     the list of variables that are currently unassigned
         domains             list of domains of all the variables
         block_occupancy     a list that keeps track of occupancy of each block, indexed
-                            from 0 to number of blocks - 1
-        row_occupancy       a list that keeps track of occupancy of each ro
-        col_occupancy
-        edge_map
-        max_edges
-        max_edge_var
-        edge_map_shadow
-        max_edges_shadow
-        max_edge_var_shadow
-        num_stars_assigned  Number of stars assigned
-        complete_csp True when every star has a value, False otherwise
-        next_star_to_assign Next star to assign (without heuristic)
+                                from 0 to number of blocks - 1
+        row_occupancy       a list that keeps track of occupancy of each row, indexed from
+                                0 to number of rows - 1
+        col_occupancy       a list that keeps track of occupancy of each column, indexed 
+                                from 0 to number of rows - 1
+        num_edge_list       a list that keeps track of the number of edges incident to each
+                                variable. indexing is done parallel to the index of variables
+        last_num_edge_list  a list that runs one iteration behind of num_edge_list for restoring
+                                vales when required
     """
     def __init__(self, blocks: list, grid_size: int, ordering_choice: int):
+        """
+        Constructor for a csp instance
+
+        :param blocks: list of all the blocks in the grid
+        :param grid_size: size of the input grid 
+        :param ordering_choice: chosen heuristic for variable ordering (0,1,2 or 3)
+        """
         num_stars = 2*grid_size # for the 2 star problem
         self.grid_size = grid_size
         self.blocks = blocks
         self.cell_map = {}
         self.start_time = time.time()
 
-        self.ordering_choice = ordering_choice
+        self.ordering_choice = ordering_choice  # chosen heuristic
 
         for i, block in enumerate(blocks):
             for cell in block:
@@ -58,7 +62,7 @@ class Csp:
         self.domains = {}
         num_domains = 0
         for block in blocks:
-            self.domains[num_domains] = set(block[:])
+            self.domains[num_domains] = set(block[:])   # deep copy required here
             self.domains[num_domains + 1] = set(block[:])
             num_domains += 2
 
@@ -66,13 +70,9 @@ class Csp:
         self.row_occupancy = [0]*grid_size
         self.col_occupancy = [0]*grid_size
 
-        self.edge_map = [num_stars]*num_stars
-        self.max_edges = 0
-        self.max_edge_var = 0
+        self.num_edge_list = [num_stars]*num_stars
 
-        self.edge_map_shadow = [num_stars]*num_stars
-        self.max_edges_shadow = 0
-        self.max_edge_var_shadow = 0
+        self.last_num_edge_list = [num_stars]*num_stars
 
     def same_row(self, value1: int, value2: int):
         """
@@ -234,8 +234,8 @@ class Csp:
         index_max_edges = 0
         max_edges = 0
         for i, var in enumerate(self.unassigned_vars):
-            if self.edge_map[var] > max_edges:
-                max_edges = self.edge_map[var]
+            if self.num_edge_list[var] > max_edges:
+                max_edges = self.num_edge_list[var]
                 index_max_edges = i
         return self.unassigned_vars[index_max_edges]
 
@@ -255,9 +255,7 @@ class Csp:
         self.col_occupancy[col] += 1
         block = self.cell_map[value]['block'] # block in which the variable is
         if self.ordering_choice == 2 or self.ordering_choice == 3:
-            self.edge_map_shadow = self.edge_map[:]
-            self.max_edges_shadow = self.max_edges
-            self.max_edge_var_shadow = self.max_edge_var
+            self.last_num_edge_list = self.num_edge_list[:]
             self.incident_edges(value, row, col, block, assignment)
         self.block_occupancy[block] += 1
         self.safe_remove_list(self.unassigned_vars, var)
@@ -279,9 +277,7 @@ class Csp:
         block = self.cell_map[value]['block'] # block in which the variable is
         self.block_occupancy[block] -= 1 
         if self.ordering_choice == 2 or self.ordering_choice == 3:
-            self.edge_map = self.edge_map_shadow[:]
-            self.max_edges = self.max_edges
-            self.max_edge_var = self.max_edge_var
+            self.num_edge_list = self.last_num_edge_list[:]
         self.unassigned_vars.append(var)
 
     def update_edge(self, cell, assignment):
@@ -297,9 +293,9 @@ class Csp:
             return
         incident_block = self.cell_map[cell]['block']
         if 2*incident_block not in assignment:
-                self.edge_map[2*incident_block] -= 1
+                self.num_edge_list[2*incident_block] -= 1
         elif 2*incident_block + 1 not in assignment:
-                self.edge_map[2*incident_block + 1] -= 1
+                self.num_edge_list[2*incident_block + 1] -= 1
 
     def incident_edges(self, value, row, col, block, assignment):
         """
