@@ -53,18 +53,18 @@ def recursive_forward_check(assignment, csp):
         checked_nodes += 1
         if csp.is_consistent(value, assignment):
             csp.assign_val(var, value, assignment) # adding to the assignment, updating other variables as required
-            removed_domains = {}  # for restore in case the assignment fails. using this eliminates unneccessary copy of unchanged domains
-            no_wipeout = csp.propogate_constraints(value, removed_domains)  # reduce domains of other variables based on the assignment
+            changed_domains = {}  # for restore in case the assignment fails. using this eliminates unneccessary copy of unchanged domains
+            no_wipeout = csp.propogate_constraints(value, changed_domains)  # reduce domains of other variables based on the assignment
             if not no_wipeout:
                 # domain wipeout detected, no point going further from here for this value
                 csp.unassign_val(var, value, assignment)
-                csp.restore_domains(removed_domains)
+                csp.restore_domains(changed_domains)
                 continue
             result = recursive_forward_check(assignment, csp)   # there wasn't a wipeout, continue to next recursion level
             if result:
                 return result   # found a valid assignment
             csp.unassign_val(var, value, assignment)
-            csp.restore_domains(removed_domains)
+            csp.restore_domains(changed_domains)
         # If the time taken is more than 10 mins, return no solution
         if (time.time() - csp.start_time) / 60 >= 10:
             return None, checked_nodes
