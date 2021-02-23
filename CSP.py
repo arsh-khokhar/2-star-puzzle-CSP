@@ -211,7 +211,6 @@ class Csp:
         
         # Hybrid of Heuristic 1 and Heuristic 2
         if self.ordering_choice == 3:
-            np.random.seed(int(time.time()))
             return np.random.choice([self.get_most_constraining(),
                                   self.get_most_constrained()], p=[0.1,0.9])
 
