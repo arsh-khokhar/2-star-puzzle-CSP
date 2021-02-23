@@ -1,6 +1,6 @@
 """
     File name: forward_checking.py
-    Author: Arsh Khokhar, Kiernan Weise
+    Author: Arsh Khokhar, Kiernan Wiese
     Date last modified: 22 February, 2021
     Python Version: 3.9
 
@@ -34,7 +34,7 @@ def forward_check(blocks: list, grid_size: int, heuristic: int):
     return recursive_forward_check({}, Csp(blocks, grid_size, heuristic))
 
 
-def recursive_forward_check(assignment, csp):
+def recursive_forward_check(assignment: set, csp: Csp):
     """
     Recursively attempts to solve the 2-star csp using forward checking
     :param assignment: Current assignment for the 2-star csp

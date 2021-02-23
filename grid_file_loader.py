@@ -1,12 +1,22 @@
-def load_grid_file(name):
+"""
+    File name: grid_file_loader.py
+    Author: Arsh Khokhar, Kiernan Wiese
+    Date last modified: 22 February, 2021
+    Python Version: 3.9
+
+    This script contains a function to read a grid file located in the same
+    folder as this script. It reads the file and returns a 2D list of blocks
+    and the size of the grid, which are used in the csp algorithms to get the
+    block constraints.
+"""
+
+
+def load_grid_file(name: str):
     """
     Reads grid file and loads data into a 2D array.
 
-    TODO: This is very basic, we'll likely need verification or to keep track
-    of other things as we progress
-
     :param name: The name of the grid file to be loaded.
-    :return: 2D array of blocks
+    :return: 2D list of blocks, size of grid
     """
 
     blocks = []
@@ -17,8 +27,7 @@ def load_grid_file(name):
             # convert strings to ints
             blocks.append([int(numeric_string) for numeric_string in cells])
 
-    # The below retrival assumes the format "gridNxN.txt". Need to add error handling later
-    grid_size = name.split('grid')[-1].split('.')[0].split('x')  # retrive size of the grid from the filename
-    assert (grid_size[0] == grid_size[-1])  # we only support square grids, so this check is required
+    # The below retrieval assumes the format "gridNxN.txt".
+    grid_size = name.split('grid')[-1].split('.')[0].split('x')
 
     return blocks, int(grid_size[0])

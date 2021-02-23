@@ -1,6 +1,6 @@
 """
     File name: backtrack.py
-    Author: Arsh Khokhar, Kiernan Weise
+    Author: Arsh Khokhar, Kiernan Wiese
     Date last modified: 22 February, 2021
     Python Version: 3.9
 
@@ -34,7 +34,7 @@ def backtrack(blocks: list, grid_size: int, heuristic: int):
     return recursive_backtrack({}, Csp(blocks, grid_size, heuristic))
 
 
-def recursive_backtrack(assignment: set, csp: object):
+def recursive_backtrack(assignment: set, csp: Csp):
     """
     Recursively attempts to solve the 2-star csp using backtracking
     :param assignment: Current assignment for the 2-star csp

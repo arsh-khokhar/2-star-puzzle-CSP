@@ -1,3 +1,14 @@
+"""
+    File name: main.py
+    Author: Arsh Khokhar, Kiernan Wiese
+    Date last modified: 22 February, 2021
+    Python Version: 3.9
+
+    This script contains the main function that calls other scripts to solve
+    and show solutions to a set of given csps. It parses command line
+    arguments that specify which algorithm and heuristic to use.
+"""
+
 import sys
 import time
 
@@ -10,11 +21,16 @@ from forward_checking import forward_check
 def main():
     if len(sys.argv) < 3:
         print('Usage: python main.py [fc or bt] [heuristic type (0,1,2,or 3)]')
-        return -1
+        exit(-1)
 
-    blocks_8x8, grid_size_8x8 = load_grid_file('grid8x8.txt')
-    blocks_10x10, grid_size_10x10 = load_grid_file('grid10x10.txt')
-    blocks_14x14, grid_size_14x14 = load_grid_file('grid14x14.txt')
+    try:
+        blocks_8x8, grid_size_8x8 = load_grid_file('grid8x8.txt')
+        blocks_10x10, grid_size_10x10 = load_grid_file('grid10x10.txt')
+        blocks_14x14, grid_size_14x14 = load_grid_file('grid14x14.txt')
+    except FileNotFoundError:
+        print("At least one of grid8x8.txt, grid10x10.txt, or grid14x14.txt "
+              "doesn't exist in this folder. Please put them there and try again.")
+        exit(-1)
 
     csp_assignment_8x8 = {}
     checked_nodes_8x8 = 0
@@ -59,7 +75,8 @@ def main():
                      title='No solution found 8x8', blocking=False)
     else:
         print("Solution found for 8x8 grid")
-        display_grid(blocks_8x8, grid_size_8x8, csp_assignment_8x8.values(),
+        display_grid(blocks_8x8, grid_size_8x8,
+                     list(csp_assignment_8x8.values()),
                      title='Solution 8x8', blocking=False)
 
     print("\nChecked {} nodes for 10x10 grid".format(checked_nodes_10x10))
@@ -70,7 +87,7 @@ def main():
     else:
         print("Solution found for 10x10 grid")
         display_grid(blocks_10x10, grid_size_10x10,
-                     csp_assignment_10x10.values(),
+                     list(csp_assignment_10x10.values()),
                      title='Solution 10x10', blocking=False)
 
     print("\nChecked {} nodes for 14x14 grid".format(checked_nodes_14x14))
@@ -81,7 +98,7 @@ def main():
     else:
         print("Solution found for 14x14 grid")
         display_grid(blocks_14x14, grid_size_14x14,
-                     csp_assignment_14x14.values(),
+                     list(csp_assignment_14x14.values()),
                      title='Solution 14x14')
 
 

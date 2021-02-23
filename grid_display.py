@@ -1,3 +1,14 @@
+"""
+    File name: grid_display.py
+    Author: Arsh Khokhar, Kiernan Wiese
+    Date last modified: 22 February, 2021
+    Python Version: 3.9
+
+    This script contains a function to open a new window to show a gui
+    representing the csp, showing the grid, blocks, and where the stars are
+    located (if there is a solution). This is done using matplotlib.
+"""
+
 import matplotlib.pyplot as plt
 
 from math import floor
