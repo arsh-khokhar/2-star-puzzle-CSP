@@ -7,8 +7,8 @@
     This script contains the CSP class for constructing a CSP instance
     of the 2-star constraint satisfaction problem
 """
-import random
 import time
+import numpy as np
 
 class Csp:
     """
@@ -23,8 +23,9 @@ class Csp:
         ordering_choice     ordering choice based on the heuristic
         unassigned_vars     the list of variables that are currently unassigned
         domains             list of domains of all the variables
-        block_occupancy     
-        row_occupancy
+        block_occupancy     a list that keeps track of occupancy of each block, indexed
+                            from 0 to number of blocks - 1
+        row_occupancy       a list that keeps track of occupancy of each ro
         col_occupancy
         edge_map
         max_edges
@@ -210,8 +211,9 @@ class Csp:
         
         # Hybrid of Heuristic 1 and Heuristic 2
         if self.ordering_choice == 3:
-            return random.choice([self.get_most_constraining(),
-                                  self.get_most_constrained()], weights=[1,10])
+            np.random.seed(int(time.time()))
+            return np.random.choice([self.get_most_constraining(),
+                                  self.get_most_constrained()], p=[0.1,0.9])
 
     def get_most_constrained(self):
         """
@@ -379,11 +381,6 @@ class Csp:
         """
         for key in changed_domains:
             self.domains[key] = set(changed_domains[key])
-
-    @staticmethod
-    def compare_with_ties(a, b):
-        diff = b[1] - a[1]
-        return diff if diff else random.choice([-1, 1])
 
     @staticmethod
     def safe_remove_list(input_list: list, value):
