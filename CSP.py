@@ -22,8 +22,8 @@ class Csp:
         start_time          start time of the csp to keep track of its initialization
         ordering_choice     ordering choice based on the heuristic
         unassigned_vars     the list of variables that are currently unassigned
-        domains
-        block_occupancy
+        domains             list of domains of all the variables
+        block_occupancy     
         row_occupancy
         col_occupancy
         edge_map
@@ -211,7 +211,7 @@ class Csp:
         # Hybrid of Heuristic 1 and Heuristic 2
         if self.ordering_choice == 3:
             return random.choice([self.get_most_constraining(),
-                                  self.get_most_constrained()])
+                                  self.get_most_constrained()], weights=[1,10])
 
     def get_most_constrained(self):
         """

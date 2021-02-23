@@ -25,7 +25,7 @@ def load_grid_file(name: str):
         for line in lines:
             cells = line.strip().split('\t')[1].split(',')
             # convert strings to ints
-            blocks.append([int(numeric_string) for numeric_string in cells])
+            blocks.append(sorted([int(numeric_string) for numeric_string in cells]))
 
     # The below retrieval assumes the format "gridNxN.txt".
     grid_size = name.split('grid')[-1].split('.')[0].split('x')
