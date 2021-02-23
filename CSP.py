@@ -255,6 +255,8 @@ class Csp:
         self.col_occupancy[col] += 1
         block = self.cell_map[value]['block'] # block in which the variable is
         if self.ordering_choice == 2 or self.ordering_choice == 3:
+            # if heuristic 2 or hybrid is chosen, edge incident is required
+            # not done for heuristic 1 for performance gain
             self.last_num_edge_list = self.num_edge_list[:]
             self.incident_edges(value, row, col, block, assignment)
         self.block_occupancy[block] += 1
@@ -280,7 +282,7 @@ class Csp:
             self.num_edge_list = self.last_num_edge_list[:]
         self.unassigned_vars.append(var)
 
-    def update_edge(self, cell, assignment):
+    def update_edge(self, cell: int, assignment: set):
         """
         Update the number of edges incident on a cell
 
@@ -292,12 +294,12 @@ class Csp:
         if cell not in self.cell_map:
             return
         incident_block = self.cell_map[cell]['block']
-        if 2*incident_block not in assignment:
-                self.num_edge_list[2*incident_block] -= 1
-        elif 2*incident_block + 1 not in assignment:
-                self.num_edge_list[2*incident_block + 1] -= 1
+        if 2*incident_block not in assignment: # first variable in the block
+            self.num_edge_list[2*incident_block] -= 1
+        elif 2*incident_block + 1 not in assignment:    # second variable in the block
+            self.num_edge_list[2*incident_block + 1] -= 1
 
-    def incident_edges(self, value, row, col, block, assignment):
+    def incident_edges(self, value: int, row: int, col: int, block: int, assignment: set):
         """
         Update the number of edges of the graph based on the assigned value
 
@@ -389,7 +391,7 @@ class Csp:
         try:
             input_list.remove(value)
         except ValueError:
-            print("trying to remove something funky from a list")
+            print("Trying to remove something non-existing from a list")
             pass
 
     @staticmethod
@@ -404,7 +406,7 @@ class Csp:
         try:
             input_set.remove(value)
         except KeyError:
-            print("trying to remove something funky from a set")
+            print("Trying to remove something non-existing from a set")
             pass
 
     @staticmethod
@@ -419,5 +421,5 @@ class Csp:
         try:
             del input_dict[value]
         except KeyError:
-            print("trying to remove something funky from a dictionary")
+            print("Trying to remove something non-existing from a dictionary")
             pass
