@@ -1,0 +1,27 @@
++------------------------------+-----------+--------------+-------------+----------------+-------------+----------------+
+| Algorithm+Heuristic          | 8x8 nodes | 8x8 run time | 10x10 nodes | 10x10 run time | 14x14 nodes | 14x14 run time |
++------------------------------+-----------+--------------+-------------+----------------+-------------+----------------+
+| Backtrack heuristic 1        | 9851      | 0.03100 sec  | 192632      | 0.2991 sec     | 233440      | 0.5321 sec     |
++------------------------------+-----------+--------------+-------------+----------------+-------------+----------------+
+| Backtrack heuristic 2        | 1971703   | 6.6186 sec   | timed out   | timed out      | timed out   | timed out      |
++------------------------------+-----------+--------------+-------------+----------------+-------------+----------------+
+| Backtrack heuristic 3        | 33353     | 0.1960 sec   | 383238      | 1.637 sec      | 567969      | 2.075 sec      |
++------------------------------+-----------+--------------+-------------+----------------+-------------+----------------+
+| Forward checking heuristic 1 | 1503      | 0.04402 sec  | 1616        | 0.05701 sec    | 64          | 0.1060 sec     |
++------------------------------+-----------+--------------+-------------+----------------+-------------+----------------+
+| Forward checking heuristic 2 | 28364     | 0.8672 sec   | 2509824     | 103.7 sec      | 2115091     | 91.71 sec      |
++------------------------------+-----------+--------------+-------------+----------------+-------------+----------------+
+| Forward checking heuristic 3 | 1976      | 0.1010 sec   | 2040        | 0.09702 sec    | 57253       | 2.969 sec      |
++------------------------------+-----------+--------------+-------------+----------------+-------------+----------------+
+
+
+The average difference in percentage between forward checking and backtracking is that
+forward checking is 360% faster (460% the speed of) backtracking (note that this doesn't
+include the tests that timed out, if we let those run to complete the increase would be
+much higher). One examples that don't match up with this are when using heuristic 1
+on the 8x8 grid, where backtracking actually ends up being faster, likely due to
+overhead cost of forward checking. Another similar example is with heuristic 3
+for the 14x14 grid, where we see similar results, although this might just be due
+to the random nature of heuristic 3. Something interesting that happened during testing was that
+heuristic 3 was actually faster than heuristic 1 on the 14x14 grid using forward checking (37 states!).
+

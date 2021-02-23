@@ -31,6 +31,8 @@ def backtrack(blocks: list, grid_size: int, heuristic: int):
     :param heuristic: The heuristic to be used for the algorithm
     :return: A valid solution of the 2-star csp
     """
+    global checked_nodes
+    checked_nodes = 0
     return recursive_backtrack({}, Csp(blocks, grid_size, heuristic))
 
 
