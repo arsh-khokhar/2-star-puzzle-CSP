@@ -42,8 +42,8 @@ of the grids, with stars placed in appropriate cells (if there's a solution).
 
 The grid file should have a name of format gridNxN.txt, where N is the grid size. The file should contain the blocks in the grid as follows:
 
-Block1\t1,2,3,4,5
-Block1\t6,7,8,9,10
-Block3\t11,12,13,14,15
-Block4\t16,17,18,19,20
-Block5\t21,22,23,24,25
+Block1\t1,2,3,4,5\
+Block1\t6,7,8,9,10\
+Block3\t11,12,13,14,15\
+Block4\t16,17,18,19,20\
+Block5\t21,22,23,24,25\
