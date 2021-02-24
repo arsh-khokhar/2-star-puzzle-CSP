@@ -1,11 +1,22 @@
+"""
+    File name: grid_display.py
+    Author: Arsh Khokhar, Kiernan Wiese
+    Date last modified: 22 February, 2021
+    Python Version: 3.8
+
+    This script contains a function to open a new window to show a gui
+    representing the csp, showing the grid, blocks, and where the stars are
+    located (if there is a solution). This is done using matplotlib.
+"""
+
 import matplotlib.pyplot as plt
-import matplotlib.widgets as widgets
+
 from math import floor
-import numpy as np
 
 
 def display_grid(blocks: list, grid_length: int, star_locs: list = None,
-                 show_block_ids: bool = False, show_ids: bool = False):
+                 show_block_ids: bool = False, show_ids: bool = False,
+                 blocking: bool = True, title: str = 'Solution'):
     """
     Displays a grid, with thick lines separating blocks. Optionally, can show
     stars, block ids, and/or position ids.
@@ -15,11 +26,15 @@ def display_grid(blocks: list, grid_length: int, star_locs: list = None,
     :param star_locs: Locations of stars.
     :param show_block_ids: Show block id within each grid position.
     :param show_ids: Show position ids within each position.
+    :param blocking: Block the show call so multiple figures can coexist.
+    :param title: Text that show in the figure window.
     :return: Opens a new window to display the grid.
     """
 
     # Create figure and axes
     fig, ax = plt.subplots(figsize=(7, 7))
+    fig.canvas.set_window_title(title)
+    ax.set_title(title)
 
     # create grid
     for x in range(grid_length + 1):
@@ -83,9 +98,9 @@ def display_grid(blocks: list, grid_length: int, star_locs: list = None,
     ax = plt.gca()  # get the axis
     ax.set_ylim(ax.get_ylim()[::-1])  # invert the axis
     ax.xaxis.tick_top()  # and move the X-Axis
-    ax.yaxis.set_ticks(np.arange(0, 5, 1))  # set y-ticks
+    ax.yaxis.set_ticks(range(0, 5))  # set y-ticks
     ax.yaxis.tick_left()  # remove right y-Ticks
 
     ax.axis('off')
     
-    plt.show()
+    plt.show(block=blocking)

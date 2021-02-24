@@ -1,34 +1,106 @@
-from GridDisplay import display_grid
+"""
+    File name: main.py
+    Author: Arsh Khokhar, Kiernan Wiese
+    Date last modified: 22 February, 2021
+    Python Version: 3.8
+
+    This script contains the main function that calls other scripts to solve
+    and show solutions to a set of given csps. It parses command line
+    arguments that specify which algorithm and heuristic to use.
+"""
+
+import sys
+import time
+
+from backtrack import backtrack
+from grid_display import display_grid
+from grid_file_loader import load_grid_file
+from forward_checking import forward_check
 
 
-def load_grid_file(name):
-    """
-    Reads grid file and loads data into a 2D array.
+def main():
+    if len(sys.argv) < 3:
+        print('Usage: python main.py [fc or bt] [heuristic type (0,1,2,or 3)]')
+        exit(-1)
 
-    TODO: This is very basic, we'll likely need verification or to keep track
-    of other things as we progress
+    try:
+        blocks_8x8, grid_size_8x8 = load_grid_file('grid8x8.txt')
+        blocks_10x10, grid_size_10x10 = load_grid_file('grid10x10.txt')
+        blocks_14x14, grid_size_14x14 = load_grid_file('grid14x14.txt')
+    except FileNotFoundError:
+        print("At least one of grid8x8.txt, grid10x10.txt, or grid14x14.txt "
+              "doesn't exist in this folder. Please put them there and try again.")
+        exit(-1)
 
-    :param name: The name of the grid file to be loaded.
-    :return: 2D array of blocks
-    """
+    csp_assignment_8x8 = {}
+    checked_nodes_8x8 = 0
+    solution_8x8 = None
+    csp_assignment_10x10 = {}
+    checked_nodes_10x10 = 0
+    solution_10x10 = None
+    csp_assignment_14x14 = {}
+    checked_nodes_14x14 = 0
+    solution_14x14 = None
 
-    blocks = []
-    with open(name, 'r') as file:
-        lines = file.readlines()
-        for line in lines:
-            cells = line.strip().split('\t')[1].split(',')
-            # convert strings to ints
-            blocks.append([int(numeric_string) for numeric_string in cells])
+    start_time = time.time()
+    if sys.argv[1].lower() == 'bt':
+        solution_8x8 = backtrack(blocks_8x8, grid_size_8x8, int(sys.argv[2]))
+        solution_10x10 = backtrack(blocks_10x10, grid_size_10x10,
+                                   int(sys.argv[2]))
+        solution_14x14 = backtrack(blocks_14x14, grid_size_14x14,
+                                   int(sys.argv[2]))
+    elif sys.argv[1].lower() == 'fc':
+        solution_8x8 = forward_check(blocks_8x8, grid_size_8x8,
+                                     int(sys.argv[2]))
+        solution_10x10 = forward_check(blocks_10x10, grid_size_10x10,
+                                       int(sys.argv[2]))
+        solution_14x14 = forward_check(blocks_14x14, grid_size_14x14,
+                                       int(sys.argv[2]))
 
-    # The below retrival assumes the format "gridNxN.txt". Need to add error handling later
-    grid_size = name.split('grid')[-1].split('.')[0].split('x') # retrive size of the grid from the filename
-    assert(grid_size[0] == grid_size[-1]) # we only support square grids, so this check is required
-    
-    return blocks, int(grid_size[0])
+    if solution_8x8:
+        csp_assignment_8x8, checked_nodes_8x8 = solution_8x8
+    if solution_10x10:
+        csp_assignment_10x10, checked_nodes_10x10 = solution_10x10
+    if solution_14x14:
+        csp_assignment_14x14, checked_nodes_14x14 = solution_14x14
+
+    end_time = time.time() - start_time
+    print("Evaluation took {} seconds ({} minutes {} seconds)"
+          .format(end_time, int(end_time // 60), end_time % 60))
+
+    print("\nChecked {} nodes for 8x8 grid".format(checked_nodes_8x8))
+    if not csp_assignment_8x8:
+        print("No solution found for 8x8 grid")
+        display_grid(blocks_8x8, grid_size_8x8, [],
+                     title='No solution found 8x8', blocking=False)
+    else:
+        print("Solution found for 8x8 grid")
+        display_grid(blocks_8x8, grid_size_8x8,
+                     list(csp_assignment_8x8.values()),
+                     title='Solution 8x8', blocking=False)
+
+    print("\nChecked {} nodes for 10x10 grid".format(checked_nodes_10x10))
+    if not csp_assignment_10x10:
+        print("No solution found for 10x10 grid")
+        display_grid(blocks_10x10, grid_size_10x10, [],
+                     title='No solution found 10x10', blocking=False)
+    else:
+        print("Solution found for 10x10 grid")
+        display_grid(blocks_10x10, grid_size_10x10,
+                     list(csp_assignment_10x10.values()),
+                     title='Solution 10x10', blocking=False)
+
+    print("\nChecked {} nodes for 14x14 grid".format(checked_nodes_14x14))
+    if not csp_assignment_14x14:
+        print("No solution found for 14x14 grid")
+        display_grid(blocks_14x14, grid_size_14x14, [],
+                     title='No solution found 14x14')
+    else:
+        print("Solution found for 14x14 grid")
+        display_grid(blocks_14x14, grid_size_14x14,
+                     list(csp_assignment_14x14.values()),
+                     title='Solution 14x14')
 
 
 if __name__ == '__main__':
-    grid, grid_length = load_grid_file('grid8x8.txt')
-    display_grid(grid, grid_length, [1,2,9,10,20,21,28,29,38,39,46,47,49,50,57,58],
-                 show_block_ids=True, show_ids=True)
-
+    main()

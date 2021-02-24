@@ -1,74 +1,69 @@
-from GridDisplay import display_grid
-from CSP import Csp
-from Examples.StringToGridArray import convert_string_to_grid_array
-import json
-import datetime
+"""
+    File name: backtrack.py
+    Author: Arsh Khokhar, Kiernan Wiese
+    Date last modified: 22 February, 2021
+    Python Version: 3.8
 
-total_states = 0
-curr_print_threshold = 0
+    This script contains the backtracking algorithm for solving the
+    2-star constraint satisfaction problem. The algorithm can be
+    called externally by calling the function backtrack, which takes
+    the grid as a 2d array of blocks, the size of the grid, and the
+    heuristic to be used as arguments.
+"""
+
+import time
+
+from CSP import Csp
+
 PRINT_THRESHOLD_INCREMENT = 100000
 
+checked_nodes = 0
+curr_print_threshold = PRINT_THRESHOLD_INCREMENT
 
-def backtrack(blocks: list, grid_size: int):
+
+def backtrack(blocks: list, grid_size: int, heuristic: int):
     """
-    Helper method for recursive_backtracking_search
+    Constructs a new csp object and calls the recursive backtracking algorithm
+    to solve the problem
 
-    :param blocks: 2D array representing the blocks of the grid
+    :param blocks: 2-D array containing the blocks, and their contents.
     :param grid_size: Size of the grid (10x10 grid -> 10)
-    :return: The csp containing a solution if there is one, None otherwise
+    :param heuristic: The heuristic to be used for the algorithm
+    :return: A valid solution of the 2-star csp
     """
-    global total_states, curr_print_threshold
-    total_states = 0
-    curr_print_threshold = PRINT_THRESHOLD_INCREMENT
-    start = datetime.datetime.now()
-    result = recursive_backtrack(Csp(grid_size, blocks))
-    end = datetime.datetime.now()
-    print('Evaluation took: {0}'.format(end - start))
-    return result
+    global checked_nodes
+    checked_nodes = 0
+    return recursive_backtrack({}, Csp(blocks, grid_size, heuristic))
 
 
-def recursive_backtrack(csp: Csp):
+def recursive_backtrack(assignment: dict, csp: Csp):
     """
-    Implements backtracking search to solve a given Constraint Satisfaction
-    Problem
-
-    :param csp: CSP object
-    :return: The csp containing a solution if there is one, None otherwise
+    Recursively attempts to solve the 2-star csp using backtracking
+    :param assignment: Current assignment for the 2-star csp
+    :param csp: 2-star csp object for the current recursion level
+    :return assignment: A valid solution of the 2-star csp, if no solution, then return None
+    :return checked_nodes: The number of nodes checked while attempting to find a solution
     """
-    global total_states, curr_print_threshold
-    if csp.complete_csp:
-        return csp
+    global checked_nodes, curr_print_threshold, PRINT_THRESHOLD_INCREMENT
+    
+    if csp.is_complete(assignment):
+        return assignment, checked_nodes
 
-    domains_copy = [x[:] for x in csp.star_domains]  # to make a deepcopy of the stuff
-    domain_min_size_copy = csp.min_domain_size
-    domain_min_num_copy = csp.min_domain_num
-    curr = csp.next_star_to_assign
-    # curr = csp.min_domain_num  # heuristic 1
-    for value in csp.star_domains[curr]:
-        total_states += 1
-        if csp.is_valid(value):
-            csp.assign_value(curr, value)
-            csp.propogate_constraints(curr, value)
-            result = recursive_backtrack(csp)
+    var = csp.get_next_unassigned_var()  # csp object takes care of the heuristic check by itself
+    
+    for value in csp.domains[var]:
+        checked_nodes += 1
+        if csp.is_consistent(value, assignment):
+            csp.assign_val(var, value, assignment)  # adding to the assignment, updating other variables as required
+            result = recursive_backtrack(assignment, csp)  # continue to next recusrion level
             if result:
-                return result
-            csp.star_domains = [x[:] for x in domains_copy]  # to make a deepcopy of the stuff
-            csp.min_domain_size = domain_min_size_copy
-            csp.min_domain_num = domain_min_num_copy
-            csp.unassign_value(curr)
-    if total_states >= curr_print_threshold:
-        print('Checked {0} states so far'.format(total_states))
+                return result   # found a valid assignment
+            csp.unassign_val(var, value, assignment)  # deleting from the assignment
+        # If the time taken is more than 10 mins, return no solution
+        if (time.time() - csp.start_time) / 60 >= 10:
+            return None, checked_nodes
+    
+    if checked_nodes >= curr_print_threshold:
+        print('Checked {0} states so far'.format(checked_nodes))
         curr_print_threshold += PRINT_THRESHOLD_INCREMENT
     return None
-
-
-# temporary test code, will be moved eventually
-grid, grid_length = convert_string_to_grid_array('AAAAAAABBBAAAACCBBBBDDDACCCCBBDDDECEFCCBDDEEEEFCGGDEEEEEFGGGEEHHEEGGGIEEEHEEEGGIEJJHEEEJGIEJJJJJJJJJ')
-csp = backtrack(grid, grid_length)
-if csp:
-    print('\nSolution found!')
-    print('\nStar positions: {0}'.format(csp.star_values))
-    print('Number of states checked: {0}'.format(total_states))
-    display_grid(grid, grid_length, csp.star_values)
-else:
-    print('no solution found')
