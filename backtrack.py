@@ -2,7 +2,7 @@
     File name: backtrack.py
     Author: Arsh Khokhar, Kiernan Wiese
     Date last modified: 22 February, 2021
-    Python Version: 3.9
+    Python Version: 3.8
 
     This script contains the backtracking algorithm for solving the
     2-star constraint satisfaction problem. The algorithm can be
@@ -36,7 +36,7 @@ def backtrack(blocks: list, grid_size: int, heuristic: int):
     return recursive_backtrack({}, Csp(blocks, grid_size, heuristic))
 
 
-def recursive_backtrack(assignment: set, csp: Csp):
+def recursive_backtrack(assignment: dict, csp: Csp):
     """
     Recursively attempts to solve the 2-star csp using backtracking
     :param assignment: Current assignment for the 2-star csp
@@ -49,16 +49,16 @@ def recursive_backtrack(assignment: set, csp: Csp):
     if csp.is_complete(assignment):
         return assignment, checked_nodes
 
-    var = csp.get_next_unassigned_var() # csp object takes care of the heuristic check by itself
+    var = csp.get_next_unassigned_var()  # csp object takes care of the heuristic check by itself
     
     for value in csp.domains[var]:
         checked_nodes += 1
         if csp.is_consistent(value, assignment):
-            csp.assign_val(var, value, assignment) # adding to the assignment, updating other variables as required
-            result = recursive_backtrack(assignment, csp)   # continue to next recusrion level
+            csp.assign_val(var, value, assignment)  # adding to the assignment, updating other variables as required
+            result = recursive_backtrack(assignment, csp)  # continue to next recusrion level
             if result:
                 return result   # found a valid assignment
-            csp.unassign_val(var, value, assignment) # deleting from the assignment
+            csp.unassign_val(var, value, assignment)  # deleting from the assignment
         # If the time taken is more than 10 mins, return no solution
         if (time.time() - csp.start_time) / 60 >= 10:
             return None, checked_nodes

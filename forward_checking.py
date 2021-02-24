@@ -2,7 +2,7 @@
     File name: forward_checking.py
     Author: Arsh Khokhar, Kiernan Wiese
     Date last modified: 22 February, 2021
-    Python Version: 3.9
+    Python Version: 3.8
 
     This script contains the forward checking algorithm for solving the
     2-star constraint satisfaction problem. The algorithm can be
@@ -36,7 +36,7 @@ def forward_check(blocks: list, grid_size: int, heuristic: int):
     return recursive_forward_check({}, Csp(blocks, grid_size, heuristic))
 
 
-def recursive_forward_check(assignment: set, csp: Csp):
+def recursive_forward_check(assignment: dict, csp: Csp):
     """
     Recursively attempts to solve the 2-star csp using forward checking
     :param assignment: Current assignment for the 2-star csp
@@ -49,20 +49,23 @@ def recursive_forward_check(assignment: set, csp: Csp):
     if csp.is_complete(assignment):
         return assignment, checked_nodes
     
-    var = csp.get_next_unassigned_var() # csp object takes care of the heuristic check by itself
+    var = csp.get_next_unassigned_var()  # csp object takes care of the heuristic check by itself
 
     for value in csp.domains[var]:
         checked_nodes += 1
         if csp.is_consistent(value, assignment):
             csp.assign_val(var, value, assignment) # adding to the assignment, updating other variables as required
-            changed_domains = {}  # for restore in case the assignment fails. using this eliminates unneccessary copy of unchanged domains
-            no_wipeout = csp.propogate_constraints(value, changed_domains)  # reduce domains of other variables based on the assignment
+            # for restore in case the assignment fails. using this eliminates unneccessary copy of unchanged domains
+            changed_domains = {}
+            # reduce domains of other variables based on the assignment
+            no_wipeout = csp.propagate_constraints(value, changed_domains)
             if not no_wipeout:
                 # domain wipeout detected, no point going further from here for this value
                 csp.unassign_val(var, value, assignment)
                 csp.restore_domains(changed_domains)
                 continue
-            result = recursive_forward_check(assignment, csp)   # there wasn't a wipeout, continue to next recursion level
+            # there wasn't a wipeout, continue to next recursion level
+            result = recursive_forward_check(assignment, csp)
             if result:
                 return result   # found a valid assignment
             csp.unassign_val(var, value, assignment)

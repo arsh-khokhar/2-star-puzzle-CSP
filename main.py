@@ -2,7 +2,7 @@
     File name: main.py
     Author: Arsh Khokhar, Kiernan Wiese
     Date last modified: 22 February, 2021
-    Python Version: 3.9
+    Python Version: 3.8
 
     This script contains the main function that calls other scripts to solve
     and show solutions to a set of given csps. It parses command line

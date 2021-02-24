@@ -2,17 +2,18 @@
     File name: CSP.py
     Author: Arsh Khokhar, Kiernan Weise
     Date last modified: 22 February, 2021
-    Python Version: 3.9
+    Python Version: 3.8
 
     This script contains the CSP class for constructing a CSP instance
     of the 2-star constraint satisfaction problem
 """
-import time
 import numpy as np
+import time
+
 
 class Csp:
     """
-    An csp of stars to spaces on a grid
+    A csp representation of the 2 star puzzle
 
     Attributes
         grid_size           Size of the grid (10x10 grid -> 10)
@@ -42,7 +43,7 @@ class Csp:
         :param grid_size: size of the input grid 
         :param ordering_choice: chosen heuristic for variable ordering (0,1,2 or 3)
         """
-        num_stars = 2*grid_size # for the 2 star problem
+        num_stars = 2*grid_size  # for the 2 star problem
         self.grid_size = grid_size
         self.blocks = blocks
         self.cell_map = {}
@@ -150,7 +151,7 @@ class Csp:
             # can safely detect the right neighbors here
             if value1 == value2 - 1 or \
                 value1 == value2 - self.grid_size - 1 or \
-                 value1 == value2 + self.grid_size - 1:
+                    value1 == value2 + self.grid_size - 1:
                 return True
 
         # check that value1 is not on left edge
@@ -158,12 +159,12 @@ class Csp:
             # can safely detect the left neighbors here
             if value1 == value2 + 1 or \
                 value1 == value2 - self.grid_size + 1 or \
-                value1 == value2 + self.grid_size + 1:
+                    value1 == value2 + self.grid_size + 1:
                 return True
 
         return False
 
-    def is_consistent(self, value: int, assignment: set):
+    def is_consistent(self, value: int, assignment: dict):
         """
         Check if a value is consistent with an existing assignment
 
@@ -182,7 +183,7 @@ class Csp:
 
         return True
 
-    def is_complete(self, assignment: set):
+    def is_complete(self, assignment: dict):
         """
         Check if an assignment is complete for the 2-star csp
 
@@ -212,7 +213,7 @@ class Csp:
         # Hybrid of Heuristic 1 and Heuristic 2
         if self.ordering_choice == 3:
             return np.random.choice([self.get_most_constraining(),
-                                  self.get_most_constrained()], p=[0.1,0.9])
+                                    self.get_most_constrained()], p=[0.1, 0.9])
 
     def get_most_constrained(self):
         """
@@ -239,7 +240,7 @@ class Csp:
                 index_max_edges = i
         return self.unassigned_vars[index_max_edges]
 
-    def assign_val(self, var: int, value: int, assignment: set):
+    def assign_val(self, var: int, value: int, assignment: dict):
         """
         Assign a value to a variable and update the related bookkeeping
         accordingly
@@ -253,16 +254,16 @@ class Csp:
         col = (value - 1) % self.grid_size
         self.row_occupancy[row] += 1
         self.col_occupancy[col] += 1
-        block = self.cell_map[value]['block'] # block in which the variable is
+        block = self.cell_map[value]['block']  # the variable's block
         if self.ordering_choice == 2 or self.ordering_choice == 3:
             # if heuristic 2 or hybrid is chosen, edge incident is required
             # not done for heuristic 1 for performance gain
             self.last_num_edge_list = self.num_edge_list[:]
-            self.incident_edges(value, row, col, block, assignment)
+            self.incident_edges(value, row, col, assignment)
         self.block_occupancy[block] += 1
         self.safe_remove_list(self.unassigned_vars, var)
 
-    def unassign_val(self, var: int, value: int, assignment: set):
+    def unassign_val(self, var: int, value: int, assignment: dict):
         """
         Unassign a variable and update the related bookkeeping
         accordingly
@@ -276,40 +277,38 @@ class Csp:
         col = (value - 1) % self.grid_size
         self.row_occupancy[row] -= 1
         self.col_occupancy[col] -= 1
-        block = self.cell_map[value]['block'] # block in which the variable is
+        block = self.cell_map[value]['block']  # the variable's block
         self.block_occupancy[block] -= 1 
         if self.ordering_choice == 2 or self.ordering_choice == 3:
             self.num_edge_list = self.last_num_edge_list[:]
         self.unassigned_vars.append(var)
 
-    def update_edge(self, cell: int, assignment: set):
+    def update_edge(self, cell: int, assignment: dict):
         """
         Update the number of edges incident on a cell
 
-        :param cell: cell associated with the block for which's variables'
+        :param cell: cell associated with the block for which variables'
                     number of edges is to be updated
-        :param value: value to assign
         :param assignment: assignment causing the update
         """
         if cell not in self.cell_map:
             return
         incident_block = self.cell_map[cell]['block']
-        if 2*incident_block not in assignment: # first variable in the block
+        if 2*incident_block not in assignment:
             self.num_edge_list[2*incident_block] -= 1
-        elif 2*incident_block + 1 not in assignment:    # second variable in the block
+        elif 2*incident_block + 1 not in assignment:
             self.num_edge_list[2*incident_block + 1] -= 1
 
-    def incident_edges(self, value: int, row: int, col: int, block: int, assignment: set):
+    def incident_edges(self, value: int, row: int, col: int, assignment: dict):
         """
         Update the number of edges of the graph based on the assigned value
 
         :param value: value that was assigned
         :param row: row of the assigned value
         :param col: column of the assigned value
-        :param block: block of the assigned value
         :param assignment: set of already assigned variables
         """
-        self.update_edge(value, assignment) # updating the edge for the pairing star in the same block
+        self.update_edge(value, assignment)  # updating the edge for the pairing star in the same block
 
         # updating the number of edges of all the cells in the same row
         for i in range(row*self.grid_size+1, row*self.grid_size+self.grid_size+1): 
@@ -332,7 +331,7 @@ class Csp:
             for i in 1, -self.grid_size + 1, self.grid_size+1:
                 self.update_edge(value + i, assignment)
     
-    def propogate_constraints(self, value: int, changed_domains: dict):
+    def propagate_constraints(self, value: int, changed_domains: dict):
         """
         Reduce the domains of the remaining unassigned variables based on
         a value being assigned
@@ -342,7 +341,7 @@ class Csp:
                                 before any changes. This will help in 
                                 restoring values in case the assignment 
                                 is failure
-        :return: True if the propogation was successful, False if there
+        :return: True if the propagation was successful, False if there
                 was a domain wipeout detected
         """
         is_row_occupied = self.is_row_occupied(value)
@@ -382,22 +381,22 @@ class Csp:
     @staticmethod
     def safe_remove_list(input_list: list, value):
         """
-        Delets an entry from a list without throwing the ValueError exception
+        Deletes an entry from a list without throwing the ValueError exception
         in case the entry is not in the set
 
-        :param input_set: set from which the entry has to be removed
+        :param input_list: set from which the entry has to be removed
         :param value: the set entry to be removed
         """
         try:
             input_list.remove(value)
         except ValueError:
-            print("Trying to remove something non-existing from a list")
+            print("trying to remove something funky from a list")
             pass
 
     @staticmethod
     def safe_remove_set(input_set: set, value):
         """
-        Delets an entry from a set without throwing the KeyError exception
+        Deletes an entry from a set without throwing the KeyError exception
         in case the entry is not in the set
 
         :param input_set: set from which the entry has to be removed
@@ -406,13 +405,13 @@ class Csp:
         try:
             input_set.remove(value)
         except KeyError:
-            print("Trying to remove something non-existing from a set")
+            print("trying to remove something funky from a set")
             pass
 
     @staticmethod
     def safe_remove_dict(input_dict: dict, value):
         """
-        Delets an entry from a dictionary without throwing the KeyError exception
+        Deletes an entry from a dictionary without throwing the KeyError exception
         in case the entry is not in the dictionary
 
         :param input_dict: dictionary from which the entry has to be removed
@@ -421,5 +420,5 @@ class Csp:
         try:
             del input_dict[value]
         except KeyError:
-            print("Trying to remove something non-existing from a dictionary")
+            print("trying to remove something funky from a dictionary")
             pass

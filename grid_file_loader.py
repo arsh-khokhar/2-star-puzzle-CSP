@@ -2,7 +2,7 @@
     File name: grid_file_loader.py
     Author: Arsh Khokhar, Kiernan Wiese
     Date last modified: 22 February, 2021
-    Python Version: 3.9
+    Python Version: 3.8
 
     This script contains a function to read a grid file located in the same
     folder as this script. It reads the file and returns a 2D list of blocks
